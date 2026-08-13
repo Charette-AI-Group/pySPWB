@@ -1,0 +1,13 @@
+# Normalise text to LF in the repository; check out native on Windows.
+* text=auto
+
+*.py   text diff=python
+*.md   text
+*.toml text
+*.yml  text
+
+# LabVIEW ground-truth fixtures are binary and must never be munged.
+*.npz  binary
+*.tdms binary
+*.wav  binary
+*.png  binary

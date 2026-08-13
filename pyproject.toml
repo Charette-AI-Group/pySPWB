@@ -1,0 +1,70 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "spwb"
+version = "0.1.0"
+description = "Signal Processing Work Bench - Python port of the SPWB LabVIEW application"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "Charette AI Group" }]
+requires-python = ">=3.10"
+keywords = ["signal processing", "dsp", "fft", "spectrum", "spectrogram",
+            "transfer function", "coherence", "vibration", "acoustics",
+            "tdms", "labview"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering",
+]
+dependencies = [
+    "numpy>=1.24",
+    "scipy>=1.10",
+]
+
+[project.optional-dependencies]
+gui = ["PySide6>=6.5", "pyqtgraph>=0.13"]
+io = ["nptdms>=1.7"]
+dev = ["pytest>=7", "PySide6>=6.5", "pyqtgraph>=0.13", "nptdms>=1.7"]
+
+[project.scripts]
+spwb = "spwb.gui.app:main"
+
+[project.urls]
+Homepage = "https://github.com/Charette-AI-Group/SPWB-py"
+"Original LabVIEW application" = "https://github.com/Charette-AI-Group/SPWB"
+Issues = "https://github.com/Charette-AI-Group/SPWB-py/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "RUF"]
+ignore = [
+    # `int(round(x))` -> `round(x)`. Only safe when x is a Python float;
+    # this package supports numpy >= 1.24, where round() on a numpy scalar
+    # did not reliably return an int. The explicit cast also documents that
+    # the result is used as an index or a count.
+    "RUF046",
+]
+
+[tool.ruff.lint.per-file-ignores]
+# The tools/ scripts are operator scripts, not library code: they drive
+# LabVIEW over COM (any call can raise, so catching broadly and reporting
+# is the point) and they are full of absolute Windows vi.lib paths that
+# cannot be usefully wrapped.
+"tools/*" = ["B904", "S110", "E501", "E701", "E702", "E402"]
+# Test modules set QT_QPA_PLATFORM before importing Qt, so their imports
+# are deliberately not at the top of the file.
+"tests/*" = ["E402"]
+"examples/*" = ["E402"]
