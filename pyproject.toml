@@ -28,10 +28,17 @@ dependencies = [
 [project.optional-dependencies]
 gui = ["PySide6>=6.5", "pyqtgraph>=0.13"]
 io = ["nptdms>=1.7"]
-dev = ["pytest>=7", "PySide6>=6.5", "pyqtgraph>=0.13", "nptdms>=1.7"]
+dev = [
+    "pytest>=7",
+    "ruff>=0.5",
+    "PySide6>=6.5",
+    "pyqtgraph>=0.13",
+    "nptdms>=1.7",
+    "matplotlib>=3.7",   # examples/ only
+]
 
 [project.scripts]
-spwb = "spwb.gui.app:main"
+spwb = "spwb.cli:main"
 
 [project.urls]
 Homepage = "https://github.com/Charette-AI-Group/SPWB-py"

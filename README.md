@@ -225,10 +225,24 @@ both windows show identical data.
 
 ```
 pip install -e .[dev]
-pytest                   # 346 tests: GUI ones run offscreen,
+pytest                   # 350 tests: GUI ones run offscreen,
                          # test_separation.py enforces the Qt boundary
+ruff check src tests tools examples
 ```
 
 `tools/` requires LabVIEW 2022 + pywin32 and is only needed to regenerate
 fixtures or re-export VI documentation from the original LabVIEW sources
-(see the `SPWB` repo and `SPWB_export/`).
+(see the `SPWB` repo and `SPWB_export/`). The fixtures are committed, so
+almost no one needs to run them.
+
+CI covers both install paths: one job installs **without** the GUI extra on
+a machine with no Qt at all and asserts the processing tests still run, and
+another installs everything and runs the full suite offscreen on Linux,
+macOS and Windows.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) — especially the two rules that are
+not negotiable (the Qt boundary, and fixtures pinning numerical behaviour).
+
+## License
+
+MIT, matching the original LabVIEW application. See [LICENSE](LICENSE).
