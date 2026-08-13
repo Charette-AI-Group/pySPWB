@@ -12,7 +12,8 @@ authors = [{ name = "Charette AI Group" }]
 requires-python = ">=3.10"
 keywords = ["signal processing", "dsp", "fft", "spectrum", "spectrogram",
             "transfer function", "coherence", "vibration", "acoustics",
-            "tdms", "labview"]
+            "tdms", "labview", "rpc3", "nastran", "head acoustics",
+            "artemis"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Science/Research",
@@ -28,6 +29,7 @@ dependencies = [
 [project.optional-dependencies]
 gui = ["PySide6>=6.5", "pyqtgraph>=0.13"]
 io = ["h5py>=3.8", "nptdms>=1.7"]
+# RPC-III, Nastran punch and HEAD acoustics HDF need nothing beyond numpy.
 dev = [
     "pytest>=7",
     "ruff>=0.5",

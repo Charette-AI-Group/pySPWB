@@ -23,9 +23,18 @@ def main(argv: list[str] | None = None) -> int:
     window.show()
 
     # any file paths on the command line are loaded into the first window
-    from ..processing.io import read_hdf5, read_tdms, read_wave
+    from ..processing.io import (
+        read_hdf5,
+        read_head_hdf,
+        read_rpc,
+        read_tdms,
+        read_wave,
+    )
     readers = {".h5": read_hdf5, ".hdf5": read_hdf5,
-               ".tdms": read_tdms, ".wav": read_wave}
+               ".tdms": read_tdms, ".wav": read_wave,
+               ".rsp": read_rpc,
+               # HEAD acoustics, not HDF5 - see io/head_hdf.py
+               ".hdf": read_head_hdf}
     for path in argv[1:]:
         reader = readers.get(Path(path).suffix.lower())
         if reader is None:

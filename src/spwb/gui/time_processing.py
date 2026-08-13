@@ -179,6 +179,14 @@ class TimeProcessingWindow(QMainWindow):
         act = QAction("Select Multiple Wave Files", self)
         act.triggered.connect(self.open_multiple_waves)
         open_menu.addAction(act)
+        # read-only formats, below the ones we also write
+        open_menu.addSeparator()
+        act = QAction("MTS RPC-III (*.rsp)", self)
+        act.triggered.connect(self.open_rpc)
+        open_menu.addAction(act)
+        act = QAction("HEAD acoustics (*.hdf)", self)
+        act.triggered.connect(self.open_head_hdf)
+        open_menu.addAction(act)
 
         save_menu = file_menu.addMenu("Save ...")
         act = QAction("SPWB / HDF5 (*.h5)", self)
@@ -212,6 +220,12 @@ class TimeProcessingWindow(QMainWindow):
         import_menu.addAction(act)
         act = QAction("From Wave File (*.wav)", self)
         act.triggered.connect(self.open_wave)
+        import_menu.addAction(act)
+        act = QAction("From RPC-III File (*.rsp)", self)
+        act.triggered.connect(self.open_rpc)
+        import_menu.addAction(act)
+        act = QAction("From HEAD acoustics File (*.hdf)", self)
+        act.triggered.connect(self.open_head_hdf)
         import_menu.addAction(act)
 
         # "Spectrums" on the original front panel: hand the selected (or all
@@ -321,8 +335,8 @@ class TimeProcessingWindow(QMainWindow):
                  f"  X unit  : {sig.x_unit or '-'}",
                  "  attributes:"]
         for key, value in sig.attributes.items():
-            if key == "TDMS":
-                value = f"<{len(value)} raw TDMS properties>"
+            if key in ("TDMS", "RPC", "HDF"):
+                value = f"<{len(value)} raw {key} properties>"
             text = str(value)
             if len(text) > 70:
                 text = text[:67] + "..."
@@ -389,6 +403,70 @@ class TimeProcessingWindow(QMainWindow):
             return
         self.statusBar().showMessage(f"Saved {len(self.store)} signal(s) "
                                      f"to {Path(path).name}")
+
+    def open_rpc(self) -> None:
+        path, _ = QFileDialog.getOpenFileName(
+            self, "Open RPC-III File", "",
+            "MTS RPC-III (*.rsp);;All files (*)")
+        if not path:
+            return
+        from ..processing.io import read_rpc, rpc_contents
+
+        self._import_channels("Open RPC-III", path, rpc_contents, read_rpc)
+
+    def open_head_hdf(self) -> None:
+        path, _ = QFileDialog.getOpenFileName(
+            self, "Open HEAD acoustics File", "",
+            "HEAD acoustics (*.hdf);;All files (*)")
+        if not path:
+            return
+        from ..processing.io import head_hdf_contents, read_head_hdf
+
+        self._import_channels("Open HEAD acoustics", path,
+                              head_hdf_contents, read_head_hdf)
+
+    def _import_channels(self, title: str, path: str, contents, reader) -> None:
+        """Shared list-channels -> pick -> import flow for read-only formats.
+
+        The reader errors are shown verbatim: for HEAD acoustics files the
+        message is an install instruction, which is the actual fix.
+        """
+        try:
+            channels = contents(path)
+        except Exception as exc:
+            QMessageBox.critical(self, title, f"Could not read file:\n{exc}")
+            return
+        if not channels:
+            QMessageBox.information(self, title, "No channels in this file.")
+            return
+
+        dialog = ChannelSelectDialog(channels, self)
+        if dialog.exec() != ChannelSelectDialog.Accepted:
+            return
+        selected = dialog.selected_paths()
+        if not selected:
+            return
+
+        kwargs = {}
+        if dialog.needs_dt():
+            fs, ok = QInputDialog.getDouble(
+                self, "Sample rate needed",
+                "Some selected channels carry no timing information.\n"
+                "Sample rate to assume (Hz):", 51200.0, 1e-6, 1e9, 3)
+            if not ok:
+                return
+            kwargs["dt"] = 1.0 / fs
+
+        try:
+            signals = reader(path, select=selected,
+                             decorate_names=len(self.store) > 0, **kwargs)
+        except Exception as exc:
+            QMessageBox.critical(self, title, f"Could not import:\n{exc}")
+            return
+        for sig in signals:
+            self.store.add(sig)
+        self.statusBar().showMessage(
+            f"Imported {len(signals)} signal(s) from {Path(path).name}")
 
     def open_hdf5(self) -> None:
         path, _ = QFileDialog.getOpenFileName(

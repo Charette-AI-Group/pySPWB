@@ -11,7 +11,8 @@ LabVIEW application by [Charette AI Group](https://github.com/Charette-AI-Group/
 SPWB is two things, and you can use either without the other:
 
 * a **signal-processing library** — spectra, transfer functions, coherence,
-  spectrograms, HDF5/TDMS/WAV IO — that runs happily in a notebook;
+  spectrograms, HDF5/TDMS/WAV IO plus read-only RPC-III, Nastran punch and
+  HEAD acoustics — that runs happily in a notebook;
 * a **desktop application** built on it, with the multi-window signal
   sharing the original was known for.
 
@@ -37,7 +38,8 @@ src/spwb/
 ├── processing/        the complete Qt-free side — use it in notebooks
 │   ├── model/         Signal (wForm + attributes), SignalStore
 │   ├── dsp/           windows, spectra, transfer functions, metrics
-│   └── io/            file formats (HDF5, TDMS, WAV)
+│   └── io/            file formats (HDF5, TDMS, WAV; read-only:
+│                      RPC-III, Nastran punch, HEAD acoustics)
 └── gui/               the PySide6 application — the ONLY package that
                        may import Qt; a pure client of processing/
 ```
@@ -104,7 +106,11 @@ ridge = spec.freqs[spec.data.argmax(axis=1)]  # dominant frequency vs time
 | `processing.io.hdf5` — **the native format**: open HDF5, documented schema, atomic writes | ✅ round-trip tested |
 | `processing.dsp.adaptive` — LMS / NLMS adaptive noise cancellation, convergence metric | ✅ done |
 | `gui` — Adaptive Filtering window: reference/noisy roles, convergence trace, learned filter | ✅ runs |
-| File IO (RPC-III, Nastran PCH, Head Acoustics HDF, text/CSV) | ⬜ next |
+| `processing.io.rpc` — **read** MTS RPC-III (`.rsp`): header keywords, group de-interleaving, per-channel scaling | ✅ read-only, tested against a byte-level fixture |
+| `processing.io.pch` — **read** Nastran punch (`.pch`): block detection, all 3 output flavours, 6 complex components | ✅ read-only, tested |
+| `processing.io.head_hdf` — **read** HEAD acoustics (`.hdf`): native parser, no DataPlugin, any platform | ✅ read-only; verified against 4 real ArtemiS recordings |
+| `gui` — RPC-III and HEAD acoustics import in the Time Processing window | ✅ runs |
+| File IO (text/CSV) | ⬜ next |
 
 ## Numerical fidelity
 
@@ -186,9 +192,10 @@ represent at all are **skipped and listed**, not stringified — a blanket
 `str()` would happily store `"<function <lambda> at 0x7f…>"`, a memory
 address masquerading as data.
 
-Note that SPWB's `.hdf` reader for **Head Acoustics** files is a different,
-proprietary format that merely shares the extension; the native format is
-`.h5`.
+Note that SPWB's `.hdf` reader for **HEAD acoustics** files
+(`spwb.processing.io.head_hdf`) handles a different, proprietary format
+that merely shares three letters of the extension; the native format is
+`.h5`. See [Read-only formats](#read-only-formats-rpc-iii-nastran-punch-head-acoustics).
 
 ### TDMS
 
@@ -241,6 +248,111 @@ conventions were therefore read off the exported block diagrams:
 double-space collapsing on names and units, and the
 `"name (source file.tdms)"` decoration from
 `WF - Append Src Name to Sig Name.vi`.
+
+### Read-only formats: RPC-III, Nastran punch, HEAD acoustics
+
+SPWB imports three foreign formats it never wrote back, and so does this
+port — there are no writers for them, deliberately. All three need nothing
+beyond numpy: no plugins, no vendor runtimes, no Windows.
+
+**MTS RPC-III (`.rsp`)** is fully implemented from the format itself. Its
+header is 128-byte keyword/value records grouped into 512-byte blocks, and
+its data is `int16` little-endian *demultiplexed by group*: all of channel
+1's `PTS_PER_GROUP` samples, then all of channel 2's, then the next group.
+Getting that interleaving wrong produces plausible-looking garbage, so
+`tests/test_rpc.py` builds the bytes by hand and asserts the values come
+back in the right order and scaled by `SCALE.CHAN_n`.
+
+Two behaviours are inherited from LabVIEW on purpose:
+
+* **keyword lookup is by prefix.** `Extract value using keyword.vi`
+  compares only the first `len(keyword)` characters, which is why SPWB
+  asks for `DELTA` and finds `DELTA_T`. Real files disagree about keyword
+  suffixes, so this is kept.
+* **the padded last group is kept.** A recording of 2.5 groups is stored as
+  3, and LabVIEW returns all of it. `read_rpc(..., trim_padding=True)` cuts
+  it back to `FRAMES × PTS_PER_FRAME` if you would rather not see the
+  trailing zeros.
+
+**Nastran punch (`.pch`)** returns `FRF` objects rather than `Signal`s,
+because the data is complex, indexed by frequency, and has six components
+(three translations, three rotations) — which is exactly what
+`READ File.vi` hands back. The three output flavours differ in how many
+lines a frequency point costs and how the numbers combine, and each is
+pinned by a hand-computed test:
+
+| header line | lines/point | combination |
+|---|---|---|
+| `$REAL OUTPUT` | 2 | real only, imaginary part 0 |
+| `$REAL-IMAGINARY OUTPUT` | 4 | lines 1–2 real, lines 3–4 imaginary |
+| `$MAGNITUDE-PHASE OUTPUT` | 4 | lines 1–2 magnitude, 3–4 phase in degrees |
+
+One **deliberate difference from LabVIEW**: `Convert Line to Obj Data.vi`
+indexes fixed offsets from `$TITLE` (line 4 is `$POINT ID`, line 5 the unit
+type, …). Real punch files put `$SUBCASE ID` / `$POINT ID` before *or*
+after the type lines depending on the Nastran version, so this port
+searches the header block by keyword instead. Files the LabVIEW app read
+give the same answer; files it mis-parsed now read correctly.
+
+**HEAD acoustics (`.hdf`)** is parsed directly, and needs no plugin. The
+LabVIEW class did not parse it: `READ - File.vi` opens the file through
+NI's *Universal Storage Interface* with HEAD acoustics' `HEAD_Data_Format`
+DataPlugin — a Windows-only install most people do not have. That turns out
+to be unnecessary. The container is self-describing and its header is plain
+ASCII, so reading it takes nothing but numpy, on any platform:
+
+```
+;
+; Copyright 1999 HEAD acoustics GmbH, Germany
+;
+byte order:                        Intel
+kind:                              Time data
+start of data:                     65536          <- payload offset
+nbr of channel:                    1
+abscissa definition:               1              <- opens a block
+delta value:                       0.000122070313
+nbr of scans:                      245760
+channel definition:                1              <- opens a block
+physical unit:                     Pa
+implementation type:               FLOAT32
+```
+
+`key: value` lines padded to `start of data` with tabs, then raw samples.
+Keys repeat, so the header is **block structured** — `name str` appears
+once per block and means something different each time. Lines starting `;`
+are comments, and `;#key: value` is a *disabled* field, which is how
+optional metadata such as the recording date is carried.
+
+Two things that look like traps and are not:
+
+* **`calibration` is not a gain.** A sample file carries `calibration: 94`
+  on a pressure channel whose samples are already in Pa and peak at exactly
+  1.0 — 94 dB is just the calibrator level (1 Pa RMS re 20 µPa). Another
+  carries `calibration: -10` on an accelerometer, which as a multiplier
+  would invert the measurement. It is kept as an attribute, not applied.
+* **`delta value` is rounded to nine significant figures**, so `1/8192` is
+  stored as `0.000122070313`. The header value is used as-is, because it is
+  what the file says and what every other reader will use.
+
+Verified against four ArtemiS recordings (`Sine 1kHz`, `SineSweep 20 to
+320Hz`, `Random`, and a measured accelerometer channel). The 1 kHz sine is
+the decisive one: least-squares fitting a 1 kHz sine to all 245 760 samples
+returns **amplitude 1.00000023** and every decoded value is exactly
+representable as `float32`, which is only possible if byte order, sample
+format and payload offset are all right. The leftover residual is the `delta
+value` rounding and nothing else — refitting with an exact `1/8192` shrinks
+it 26× (4.0e-4 → 1.5e-5), and `test_head_hdf.py` asserts that relationship
+so a real bug cannot hide behind it.
+
+Those recordings are not in the repo (not ours to publish), so the suite
+builds equivalent files byte-for-byte and the real-file tests skip when the
+data is absent — point `SPWB_ARTEMIS_DIR` at a copy to run them.
+
+Multi-channel files interleave sample-by-sample (`data org: a1b1 a2b2`).
+Only single-channel recordings were available, so any other `data org`
+value is **refused with a clear error** rather than de-interleaved on a
+guess. `FLOAT32` is the only `implementation type` seen in the wild; the
+others decode on the same path but are untested against real files.
 
 ## Running
 
