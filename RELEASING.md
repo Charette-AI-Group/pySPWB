@@ -21,7 +21,7 @@ automated from here.
    |---|---|
    | PyPI Project Name | `spwb` |
    | Owner | `Charette-AI-Group` |
-   | Repository name | `SPWB-py` |
+   | Repository name | `pySPWB` |
    | Workflow name | `publish.yml` |
    | Environment name | `pypi` |
 
@@ -30,7 +30,7 @@ automated from here.
    except **Environment name** = `testpypi`.
 
 4. **Create the two GitHub environments** at
-   <https://github.com/Charette-AI-Group/SPWB-py/settings/environments>:
+   <https://github.com/Charette-AI-Group/pySPWB/settings/environments>:
    one named `pypi` and one named `testpypi`. Leave them empty — they hold
    no secrets. Adding *Required reviewers* to `pypi` is worth doing: it
    makes every upload pause for a human click.

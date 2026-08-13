@@ -1,7 +1,7 @@
-# SPWB-py
+# pySPWB
 
-[![tests](https://github.com/Charette-AI-Group/SPWB-py/actions/workflows/tests.yml/badge.svg)](https://github.com/Charette-AI-Group/SPWB-py/actions/workflows/tests.yml)
-[![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/Charette-AI-Group/SPWB-py/blob/main/LICENSE)
+[![tests](https://github.com/Charette-AI-Group/pySPWB/actions/workflows/tests.yml/badge.svg)](https://github.com/Charette-AI-Group/pySPWB/actions/workflows/tests.yml)
+[![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/Charette-AI-Group/pySPWB/blob/main/LICENSE)
 [![python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org)
 
 Python port of the **Signal Processing Work Bench** (SPWB), originally a
@@ -407,11 +407,11 @@ a machine with no Qt at all and asserts the processing tests still run, and
 another installs everything and runs the full suite offscreen on Linux,
 macOS and Windows.
 
-See [CONTRIBUTING.md](https://github.com/Charette-AI-Group/SPWB-py/blob/main/CONTRIBUTING.md)
+See [CONTRIBUTING.md](https://github.com/Charette-AI-Group/pySPWB/blob/main/CONTRIBUTING.md)
 — especially the two rules that are
 not negotiable (the Qt boundary, and fixtures pinning numerical behaviour).
 
 ## License
 
 MIT, matching the original LabVIEW application.
-See [LICENSE](https://github.com/Charette-AI-Group/SPWB-py/blob/main/LICENSE).
+See [LICENSE](https://github.com/Charette-AI-Group/pySPWB/blob/main/LICENSE).

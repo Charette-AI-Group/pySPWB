@@ -1,4 +1,4 @@
-# Contributing to SPWB-py
+# Contributing to pySPWB
 
 Thanks for looking. This is a port of a LabVIEW application, and a few of
 its rules are unusual — worth reading before your first change.
@@ -71,7 +71,7 @@ Match the surrounding code. Notably:
 
 ## Reporting a numerical difference
 
-If SPWB-py disagrees with the LabVIEW application on real data, that is the
+If pySPWB disagrees with the LabVIEW application on real data, that is the
 most valuable bug report this project can get. Please include:
 
 * the input (a small TDMS or WAV if you can share one),

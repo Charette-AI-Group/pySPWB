@@ -43,9 +43,9 @@ dev = [
 spwb = "spwb.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/Charette-AI-Group/SPWB-py"
+Homepage = "https://github.com/Charette-AI-Group/pySPWB"
 "Original LabVIEW application" = "https://github.com/Charette-AI-Group/SPWB"
-Issues = "https://github.com/Charette-AI-Group/SPWB-py/issues"
+Issues = "https://github.com/Charette-AI-Group/pySPWB/issues"
 
 [tool.setuptools.packages.find]
 where = ["src"]
