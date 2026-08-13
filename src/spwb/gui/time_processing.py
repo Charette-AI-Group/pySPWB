@@ -220,6 +220,10 @@ class TimeProcessingWindow(QMainWindow):
         act.setShortcut("Ctrl+G")
         act.triggered.connect(self.open_tfa_window)
         analysis_menu.addAction(act)
+        act = QAction("Adaptive Filtering (LMS) ...", self)
+        act.setShortcut("Ctrl+L")
+        act.triggered.connect(self.open_lms_window)
+        analysis_menu.addAction(act)
 
         window_menu = bar.addMenu("&Window")
         act = QAction("New (empty)", self)
@@ -520,6 +524,11 @@ class TimeProcessingWindow(QMainWindow):
         """Front-panel 'TFA': send signals to a new Time-Frequency window."""
         from .tfa_analysis import TimeFrequencyWindow
         return self._send_to(TimeFrequencyWindow, "Time Frequency Analysis")
+
+    def open_lms_window(self):
+        """Send signals to a new Adaptive Filtering window."""
+        from .lms_analysis import LMSWindow
+        return self._send_to(LMSWindow, "Adaptive Filtering")
 
     def new_window(self) -> TimeProcessingWindow:
         window = TimeProcessingWindow(self.manager)

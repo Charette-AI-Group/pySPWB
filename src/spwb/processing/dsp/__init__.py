@@ -1,3 +1,9 @@
+from .adaptive import (
+    LMS_FILTER_CLASSES,
+    LMSResult,
+    cross_correlation_metric,
+    lms_filter,
+)
 from .conditioning import (
     NORMALIZATION_OPTIONS,
     calibrate,
@@ -46,6 +52,7 @@ __all__ = [
     "ACOUSTIC_WEIGHTINGS",
     "COLOR_TABLES",
     "DB_REFERENCES",
+    "LMS_FILTER_CLASSES",
     "NORMALIZATION_OPTIONS",
     "SPECTRAL_FUNCTION_TYPES",
     "SPECTRUM_DISPLAY_OPTIONS",
@@ -55,6 +62,7 @@ __all__ = [
     "TREND_TYPES",
     "WINDOW_NAMES",
     "CrossSpectra",
+    "LMSResult",
     "SignalStatistics",
     "Spectrogram",
     "WindowProps",
@@ -65,10 +73,12 @@ __all__ = [
     "band_power",
     "band_rms",
     "calibrate",
+    "cross_correlation_metric",
     "cross_power_spectrum",
     "cross_spectra",
     "format_spectrum",
     "format_transfer_function",
+    "lms_filter",
     "normalize",
     "offset",
     "props",

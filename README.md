@@ -96,8 +96,9 @@ ridge = spec.freqs[spec.data.argmax(axis=1)]  # dominant frequency vs time
 | `processing.dsp.metrics` — statistics and the 7 sliding-window trend types | ✅ validated vs LabVIEW 2022 |
 | `processing.dsp.conditioning` — calibrate, offset, normalise, truncate, resample | ✅ done |
 | `gui` — Time Processing analysis tabs: Scale Signals, Stats, TV Metrics | ✅ runs |
+| `processing.dsp.adaptive` — LMS / NLMS adaptive noise cancellation, convergence metric | ✅ done |
+| `gui` — Adaptive Filtering window: reference/noisy roles, convergence trace, learned filter | ✅ runs |
 | File IO (RPC-III, Nastran PCH, HDF, text) | ⬜ next |
-| Adaptive filtering (LMS) | ⬜ planned |
 
 ## Numerical fidelity
 
@@ -210,6 +211,12 @@ spwb                     # or: python -m spwb
 spwb run.tdms take1.wav  # loads files into the first window
 ```
 
+On Windows you can instead **double-click `runApp.cmd`**. It prefers a
+`.venv` beside it over whatever Python is on PATH, offers to install SPWB
+the first time, and explains what to do rather than flashing a console
+window and vanishing if something is missing. Dropping data files onto it
+opens them.
+
 ### Architecture
 
 Each window owns a `SignalStore`; `WindowManager` is the registry that
@@ -234,7 +241,7 @@ both windows show identical data.
 
 ```
 pip install -e .[dev]
-pytest                   # 450 tests: GUI ones run offscreen,
+pytest                   # 487 tests: GUI ones run offscreen,
                          # test_separation.py enforces the Qt boundary
 ruff check src tests tools examples
 ```

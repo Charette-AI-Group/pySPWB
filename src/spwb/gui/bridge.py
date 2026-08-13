@@ -60,6 +60,7 @@ class WindowManager(QObject):
         "FFTWindow": "FFT",
         "TransferFunctionWindow": "TF",
         "TimeFrequencyWindow": "TFA",
+        "LMSWindow": "LMS",
     }
 
     def __init__(self, parent: QObject | None = None) -> None:

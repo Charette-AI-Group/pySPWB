@@ -9,16 +9,18 @@ stays importable without it.
 from .app import main
 from .bridge import StoreBridge, WindowManager
 from .fft_analysis import FFTWindow
+from .lms_analysis import LMSWindow
 from .tf_analysis import TransferFunctionWindow
 from .tfa_analysis import TimeFrequencyWindow
 from .time_processing import TimeProcessingWindow
 
 __all__ = [
-           "FFTWindow",
-           "StoreBridge",
-           "TimeFrequencyWindow",
-           "TimeProcessingWindow",
-           "TransferFunctionWindow",
-           "WindowManager",
-           "main",
+    "FFTWindow",
+    "LMSWindow",
+    "StoreBridge",
+    "TimeFrequencyWindow",
+    "TimeProcessingWindow",
+    "TransferFunctionWindow",
+    "WindowManager",
+    "main",
 ]
