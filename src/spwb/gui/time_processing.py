@@ -29,6 +29,7 @@ from PySide6.QtWidgets import (
     QPlainTextEdit,
     QPushButton,
     QSplitter,
+    QTabWidget,
     QTreeWidget,
     QTreeWidgetItem,
     QVBoxLayout,
@@ -37,6 +38,7 @@ from PySide6.QtWidgets import (
 
 from ..processing.model.signal import Signal
 from ..processing.model.store import SignalStore
+from .analysis_tabs import ScaleSignalsTab, StatsTab, TVMetricsTab
 from .bridge import StoreBridge, WindowManager
 from .dialogs import ChannelSelectDialog, CreateSignalDialog, ImportFromWindowDialog
 
@@ -61,8 +63,10 @@ class TimeProcessingWindow(QMainWindow):
         self._build_menus()
 
         self.bridge.changed.connect(self._refresh_list)
+        self.bridge.changed.connect(self._refresh_tabs)
         self.manager.windows_changed.connect(self._update_import_action)
         self._refresh_list()
+        self._refresh_tabs()
         self._update_import_action()
 
     # -- convenience ---------------------------------------------------------
@@ -123,14 +127,36 @@ class TimeProcessingWindow(QMainWindow):
         self.plot.setLabel("left", "Amplitude")
         self.legend = self.plot.addLegend(offset=(-10, 10))
 
+        # the panel's analysis tabs, below the plot
+        self.tabs = QTabWidget()
+        self.scale_tab = ScaleSignalsTab(self.store)
+        self.stats_tab = StatsTab(self.store)
+        self.tvm_tab = TVMetricsTab(self.store)
+        self.tabs.addTab(self.scale_tab, "Scale Signals")
+        self.tabs.addTab(self.stats_tab, "Stats")
+        self.tabs.addTab(self.tvm_tab, "TV Metrics")
+        self.tabs.currentChanged.connect(lambda _: self._refresh_tabs())
+
+        right = QSplitter(Qt.Vertical)
+        right.addWidget(self.plot)
+        right.addWidget(self.tabs)
+        right.setStretchFactor(0, 1)
+        right.setSizes([440, 260])
+
         splitter = QSplitter(Qt.Horizontal)
         splitter.addWidget(left)
-        splitter.addWidget(self.plot)
+        splitter.addWidget(right)
         splitter.setStretchFactor(0, 0)
         splitter.setStretchFactor(1, 1)
         splitter.setSizes([420, 680])
         self.setCentralWidget(splitter)
         self.statusBar().showMessage("Ready")
+
+    def _refresh_tabs(self) -> None:
+        """Rebuild only the visible tab: the others rebuild when shown."""
+        current = self.tabs.currentWidget()
+        if current is not None:
+            current.refresh()
 
     def _build_menus(self) -> None:
         bar = self.menuBar()

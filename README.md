@@ -93,8 +93,11 @@ ridge = spec.freqs[spec.data.argmax(axis=1)]  # dominant frequency vs time
 | `processing.dsp.timefreq` — STFT spectrogram, cross sections, dB scaling | ✅ validated vs LabVIEW 2022 |
 | `gui` — Time-Frequency window: spectrogram, cursor-driven Time/Frequency sections, colour tables | ✅ runs |
 | `processing.io.wave` — WAV read/write, filename scale convention, all 4 save options | ✅ round-trip tested; LabVIEW reads our files bit-exactly |
+| `processing.dsp.metrics` — statistics and the 7 sliding-window trend types | ✅ validated vs LabVIEW 2022 |
+| `processing.dsp.conditioning` — calibrate, offset, normalise, truncate, resample | ✅ done |
+| `gui` — Time Processing analysis tabs: Scale Signals, Stats, TV Metrics | ✅ runs |
 | File IO (RPC-III, Nastran PCH, HDF, text) | ⬜ next |
-| Time Processing analysis tabs (Scale, Stats, TV Metrics), adaptive filtering (LMS) | ⬜ planned |
+| Adaptive filtering (LMS) | ⬜ planned |
 
 ## Numerical fidelity
 
@@ -134,6 +137,12 @@ Port notes discovered on the way:
   and only then divide — the original diagram carries this as two
   hand-written warnings. Averaging per-block `H`, or averaging `|Sxy|`,
   silently pins coherence at 1 and destroys H1's noise rejection.
+* The trend metrics inherit **two disagreeing normalisations** from NI:
+  `Moment about Mean.vi` divides by `N`, while `Std Deviation and
+  Variance.vi` divides by `N-1`. So Variance and Standard Deviation are the
+  sample forms, but Skewness (`m3/σ³`) and Kurtosis (`m4/σ⁴`) mix a
+  population moment with a sample sigma. Kurtosis is not *excess* kurtosis
+  — a Gaussian reads ≈ 3, not 0.
 * NI's STFT spectrogram is **not** `scipy.signal.spectrogram`'s default:
   frames are centre-aligned (the signal is pre-padded by `nfft//2`), its
   "time steps" input is the **hop in samples** rather than a frame count,
@@ -225,7 +234,7 @@ both windows show identical data.
 
 ```
 pip install -e .[dev]
-pytest                   # 350 tests: GUI ones run offscreen,
+pytest                   # 450 tests: GUI ones run offscreen,
                          # test_separation.py enforces the Qt boundary
 ruff check src tests tools examples
 ```
