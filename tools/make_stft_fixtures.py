@@ -5,6 +5,7 @@ spectrogram scaling, block placement and frequency-bin count are pinned to
 LabVIEW rather than guessed.
 """
 import os
+import pathlib
 
 import numpy as np
 import pythoncom
@@ -14,7 +15,9 @@ from win32com.client import VARIANT
 STFT = (r"C:\Program Files\National Instruments\LabVIEW 2022\vi.lib\addons"
         r"\Time Frequency Analysis\Spectrogram.llb"
         r"\TFA STFT Spectrogram (Real).vi")
-OUT = r"W:\projects\Charette_AI_Group\SPWB-py\tests\fixtures"
+# found relative to this script, so the tools follow the checkout wherever
+# it is moved rather than writing to a stale absolute path
+OUT = str(pathlib.Path(__file__).resolve().parents[1] / "tests" / "fixtures")
 os.makedirs(OUT, exist_ok=True)
 
 app = win32com.client.dynamic.Dispatch("LabVIEW.Application")

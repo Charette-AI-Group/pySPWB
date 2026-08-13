@@ -5,6 +5,7 @@ Calls (via COM, explicit dispids):
   NI_AALPro.lvlib:Auto Power Spectrum.vi              (Signal (V), dt)
 """
 import os
+import pathlib
 
 import numpy as np
 import pythoncom
@@ -12,7 +13,9 @@ import win32com.client
 
 STDW = r"C:\Program Files\National Instruments\LabVIEW 2022\vi.lib\Analysis\0measdsp.llb\Scaled Time Domain Window (DBL).vi"
 APS = r"C:\Program Files\National Instruments\LabVIEW 2022\vi.lib\Analysis\0measdsp.llb\Auto Power Spectrum.vi"
-OUT = r"W:\projects\Charette_AI_Group\SPWB-py\tests\fixtures"
+# found relative to this script, so the tools follow the checkout wherever
+# it is moved rather than writing to a stale absolute path
+OUT = str(pathlib.Path(__file__).resolve().parents[1] / "tests" / "fixtures")
 os.makedirs(OUT, exist_ok=True)
 
 app = win32com.client.dynamic.Dispatch("LabVIEW.Application")

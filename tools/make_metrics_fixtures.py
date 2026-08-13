@@ -15,6 +15,7 @@ two. This script freezes both so the port cannot drift.
 Requires LabVIEW 2022 + pywin32 on Windows.
 """
 import os
+import pathlib
 
 import numpy as np
 import pythoncom
@@ -26,7 +27,9 @@ ANALYSIS = (r"C:\Program Files\National Instruments\LabVIEW 2022"
 MOMENT = ANALYSIS + r"\5stat.llb\Moment about Mean.vi"
 STDDEV = ANALYSIS + r"\baseanly.llb\Std Deviation and Variance.vi"
 RMS = ANALYSIS + r"\5stat.llb\RMS (DBL).vi"
-OUT = r"W:\projects\Charette_AI_Group\SPWB-py\tests\fixtures"
+# found relative to this script, so the tools follow the checkout wherever
+# it is moved rather than writing to a stale absolute path
+OUT = str(pathlib.Path(__file__).resolve().parents[1] / "tests" / "fixtures")
 os.makedirs(OUT, exist_ok=True)
 
 app = win32com.client.dynamic.Dispatch("LabVIEW.Application")

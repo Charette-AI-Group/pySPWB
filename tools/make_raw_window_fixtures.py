@@ -1,5 +1,6 @@
 """Dump NI's raw windows (x = ones -> wx = w/CG) for exact comparison."""
 import os
+import pathlib
 
 import numpy as np
 import pythoncom
@@ -7,7 +8,9 @@ import win32com.client
 from win32com.client import VARIANT
 
 STDW = r"C:\Program Files\National Instruments\LabVIEW 2022\vi.lib\Analysis\0measdsp.llb\Scaled Time Domain Window (DBL).vi"
-OUT = r"W:\projects\Charette_AI_Group\SPWB-py\tests\fixtures"
+# found relative to this script, so the tools follow the checkout wherever
+# it is moved rather than writing to a stale absolute path
+OUT = str(pathlib.Path(__file__).resolve().parents[1] / "tests" / "fixtures")
 app = win32com.client.dynamic.Dispatch("LabVIEW.Application")
 N = 1024
 x = np.ones(N).tolist()

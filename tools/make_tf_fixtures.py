@@ -5,6 +5,7 @@ port's cross-spectrum convention (which side is conjugated, and the 2/N^2
 scaling) is pinned to LabVIEW rather than guessed.
 """
 import os
+import pathlib
 
 import numpy as np
 import pythoncom
@@ -13,7 +14,9 @@ from win32com.client import VARIANT
 
 CPS = r"C:\Program Files\National Instruments\LabVIEW 2022\vi.lib\Analysis\0measdsp.llb\Cross Power Spectrum.vi"
 APS = r"C:\Program Files\National Instruments\LabVIEW 2022\vi.lib\Analysis\0measdsp.llb\Auto Power Spectrum.vi"
-OUT = r"W:\projects\Charette_AI_Group\SPWB-py\tests\fixtures"
+# found relative to this script, so the tools follow the checkout wherever
+# it is moved rather than writing to a stale absolute path
+OUT = str(pathlib.Path(__file__).resolve().parents[1] / "tests" / "fixtures")
 os.makedirs(OUT, exist_ok=True)
 
 app = win32com.client.dynamic.Dispatch("LabVIEW.Application")
