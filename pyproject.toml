@@ -27,7 +27,7 @@ dependencies = [
 
 [project.optional-dependencies]
 gui = ["PySide6>=6.5", "pyqtgraph>=0.13"]
-io = ["nptdms>=1.7"]
+io = ["h5py>=3.8", "nptdms>=1.7"]
 dev = [
     "pytest>=7",
     "ruff>=0.5",

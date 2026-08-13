@@ -11,9 +11,14 @@ LabVIEW application by [Charette AI Group](https://github.com/Charette-AI-Group/
 SPWB is two things, and you can use either without the other:
 
 * a **signal-processing library** — spectra, transfer functions, coherence,
-  spectrograms, TDMS and WAV IO — that runs happily in a notebook;
+  spectrograms, HDF5/TDMS/WAV IO — that runs happily in a notebook;
 * a **desktop application** built on it, with the multi-window signal
   sharing the original was known for.
+
+Its native file format is plain **HDF5**, so a measurement saved here opens
+in MATLAB, Julia, R or HDFView without SPWB installed —
+see [`docs/hdf5-format.md`](docs/hdf5-format.md). TDMS is still read and
+written, so existing LabVIEW data keeps working.
 
 ```bash
 pip install spwb          # the library: numpy + scipy, no GUI stack
@@ -31,8 +36,8 @@ match. See [Numerical fidelity](#numerical-fidelity).
 src/spwb/
 ├── processing/        the complete Qt-free side — use it in notebooks
 │   ├── model/         Signal (wForm + attributes), SignalStore
-│   ├── dsp/           windows, spectral analysis
-│   └── io/            file formats (TDMS, ...)
+│   ├── dsp/           windows, spectra, transfer functions, metrics
+│   └── io/            file formats (HDF5, TDMS, WAV)
 └── gui/               the PySide6 application — the ONLY package that
                        may import Qt; a pure client of processing/
 ```
@@ -50,7 +55,7 @@ from spwb.processing import Signal
 from spwb.processing.io import read_tdms
 from spwb.processing.dsp import auto_power_spectrums
 
-signals = read_tdms("run.tdms")
+signals = read_tdms("run.tdms")     # or read_hdf5("run.h5") / read_wave(...)
 spectrum = auto_power_spectrums(signals[0], freq_resolution=1.0, window="hanning")
 
 # ... and everything the FFT window's controls do is available here too
@@ -96,9 +101,10 @@ ridge = spec.freqs[spec.data.argmax(axis=1)]  # dominant frequency vs time
 | `processing.dsp.metrics` — statistics and the 7 sliding-window trend types | ✅ validated vs LabVIEW 2022 |
 | `processing.dsp.conditioning` — calibrate, offset, normalise, truncate, resample | ✅ done |
 | `gui` — Time Processing analysis tabs: Scale Signals, Stats, TV Metrics | ✅ runs |
+| `processing.io.hdf5` — **the native format**: open HDF5, documented schema, atomic writes | ✅ round-trip tested |
 | `processing.dsp.adaptive` — LMS / NLMS adaptive noise cancellation, convergence metric | ✅ done |
 | `gui` — Adaptive Filtering window: reference/noisy roles, convergence trace, learned filter | ✅ runs |
-| File IO (RPC-III, Nastran PCH, HDF, text) | ⬜ next |
+| File IO (RPC-III, Nastran PCH, Head Acoustics HDF, text/CSV) | ⬜ next |
 
 ## Numerical fidelity
 
@@ -150,6 +156,39 @@ Port notes discovered on the way:
   it returns `nfft//2` bins without the factor-2 single-sided doubling, and
   each bin is `|FFT(w·x)|² / (Σw² · nfft)` — a power quantity where a sine
   of amplitude A through a rectangular window peaks at `A²/4`.
+
+### HDF5 — the native format
+
+The Python port stores data as plain **HDF5** rather than TDMS. TDMS was
+the right default for a LabVIEW application; for an open-source Python one,
+HDF5 is an open standard with the same data model (file → groups →
+channels, attributes at every level) that MATLAB, Julia, R, C++ and
+HDFView read natively. The layout is written down in
+[`docs/hdf5-format.md`](docs/hdf5-format.md) so the files stay meaningful
+without this project.
+
+Three choices are load-bearing and easy to undo by accident:
+
+* **strings are fixed-length UTF-8 bytes**, not h5py's default
+  variable-length strings, which older MATLAB and some C readers handle
+  poorly. A test asserts the on-disk dtype, since the difference is
+  invisible from Python;
+* **writes are atomic** — a temporary file, then a rename — because a
+  process killed mid-write is the one way to make an HDF5 file unreadable.
+  A test kills the rename and checks the previous file survives intact;
+* **the `name` attribute is authoritative**, not the dataset key: HDF5
+  keys cannot contain `/` and must be unique, so `Left/Right` and repeated
+  names are stored under adjusted keys with the real name alongside.
+
+Attributes that HDF5 cannot hold natively (the raw TDMS property block,
+say) are JSON-encoded and listed in `_spwb_json_attrs`. Values it cannot
+represent at all are **skipped and listed**, not stringified — a blanket
+`str()` would happily store `"<function <lambda> at 0x7f…>"`, a memory
+address masquerading as data.
+
+Note that SPWB's `.hdf` reader for **Head Acoustics** files is a different,
+proprietary format that merely shares the extension; the native format is
+`.h5`.
 
 ### TDMS
 
@@ -241,7 +280,7 @@ both windows show identical data.
 
 ```
 pip install -e .[dev]
-pytest                   # 487 tests: GUI ones run offscreen,
+pytest                   # 530 tests: GUI ones run offscreen,
                          # test_separation.py enforces the Qt boundary
 ruff check src tests tools examples
 ```

@@ -163,8 +163,13 @@ class TimeProcessingWindow(QMainWindow):
 
         file_menu = bar.addMenu("&File")
         open_menu = file_menu.addMenu("Open ...")
-        act = QAction("National Instruments (*.tdms)", self)
+        # HDF5 first: it is the native format of the Python port
+        act = QAction("SPWB / HDF5 (*.h5, *.hdf5)", self)
         act.setShortcut(QKeySequence.Open)
+        act.triggered.connect(self.open_hdf5)
+        open_menu.addAction(act)
+        open_menu.addSeparator()
+        act = QAction("National Instruments (*.tdms)", self)
         act.triggered.connect(self.open_tdms)
         open_menu.addAction(act)
         act = QAction("Wave Files (*.wav)", self)
@@ -176,8 +181,12 @@ class TimeProcessingWindow(QMainWindow):
         open_menu.addAction(act)
 
         save_menu = file_menu.addMenu("Save ...")
-        act = QAction("National Instruments (*.tdms)", self)
+        act = QAction("SPWB / HDF5 (*.h5)", self)
         act.setShortcut(QKeySequence.Save)
+        act.triggered.connect(self.save_hdf5)
+        save_menu.addAction(act)
+        save_menu.addSeparator()
+        act = QAction("National Instruments (*.tdms)", self)
         act.triggered.connect(self.save_tdms)
         save_menu.addAction(act)
         act = QAction("Wave Files (*.wav)", self)
@@ -380,6 +389,46 @@ class TimeProcessingWindow(QMainWindow):
             return
         self.statusBar().showMessage(f"Saved {len(self.store)} signal(s) "
                                      f"to {Path(path).name}")
+
+    def open_hdf5(self) -> None:
+        path, _ = QFileDialog.getOpenFileName(
+            self, "Open SPWB / HDF5 File", "",
+            "SPWB / HDF5 (*.h5 *.hdf5);;All files (*)")
+        if not path:
+            return
+        from ..processing.io import read_hdf5
+
+        try:
+            signals = read_hdf5(path, decorate_names=len(self.store) > 0)
+        except Exception as exc:
+            QMessageBox.critical(self, "Open HDF5",
+                                 f"Could not read:\n{exc}")
+            return
+        for sig in signals:
+            self.store.add(sig)
+        self.statusBar().showMessage(
+            f"Imported {len(signals)} signal(s) from {Path(path).name}")
+
+    def save_hdf5(self) -> None:
+        signals = self._visible_signals()
+        if not signals:
+            QMessageBox.information(self, "Save HDF5", "No signals to save.")
+            return
+        path, _ = QFileDialog.getSaveFileName(
+            self, "Save SPWB / HDF5 File", "", "SPWB / HDF5 (*.h5)")
+        if not path:
+            return
+        from ..processing.io import write_hdf5
+
+        try:
+            written = write_hdf5(path, signals)
+        except Exception as exc:
+            QMessageBox.critical(self, "Save HDF5",
+                                 f"Could not write:\n{exc}")
+            return
+        self.statusBar().showMessage(
+            f"Saved {len(signals)} signal(s) to {written.name} - readable by "
+            f"MATLAB, Julia and any HDF5 tool")
 
     def open_wave(self) -> None:
         path, _ = QFileDialog.getOpenFileName(
