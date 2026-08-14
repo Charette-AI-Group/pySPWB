@@ -175,6 +175,9 @@ class TimeProcessingWindow(QMainWindow):
         act = QAction("Wave Files (*.wav)", self)
         act.triggered.connect(self.open_wave)
         open_menu.addAction(act)
+        act = QAction("Text / CSV (*.csv, *.txt)", self)
+        act.triggered.connect(self.open_text)
+        open_menu.addAction(act)
         open_menu.addSeparator()
         act = QAction("Select Multiple Wave Files", self)
         act.triggered.connect(self.open_multiple_waves)
@@ -199,6 +202,9 @@ class TimeProcessingWindow(QMainWindow):
         save_menu.addAction(act)
         act = QAction("Wave Files (*.wav)", self)
         act.triggered.connect(self.save_wave)
+        save_menu.addAction(act)
+        act = QAction("Text / CSV for Excel (*.csv)", self)
+        act.triggered.connect(self.save_text)
         save_menu.addAction(act)
 
         file_menu.addSeparator()
@@ -403,6 +409,53 @@ class TimeProcessingWindow(QMainWindow):
             return
         self.statusBar().showMessage(f"Saved {len(self.store)} signal(s) "
                                      f"to {Path(path).name}")
+
+    def open_text(self) -> None:
+        path, _ = QFileDialog.getOpenFileName(
+            self, "Open Text / CSV File", "",
+            "Text and CSV (*.csv *.txt *.dat *.asc);;All files (*)")
+        if not path:
+            return
+        from ..processing.io import read_text, text_contents
+
+        self._import_channels("Open Text / CSV", path, text_contents,
+                              read_text)
+
+    def save_text(self) -> None:
+        signals = self._visible_signals()
+        if not signals:
+            QMessageBox.information(self, "Save Text / CSV",
+                                    "No signals to save.")
+            return
+        path, _ = QFileDialog.getSaveFileName(
+            self, "Save Text / CSV File", "", "CSV (*.csv);;Text (*.txt)")
+        if not path:
+            return
+        from ..processing.io import LOCALES, write_text
+
+        # A French- or German-locale Excel reads "1,5" as a number and needs
+        # ";" between fields; a dot-decimal file lands in one text column
+        # there. Ask rather than guess, because the right answer depends on
+        # the machine the file is opened on, not the one writing it.
+        choice, ok = QInputDialog.getItem(
+            self, "Number format",
+            "Which number format should Excel expect?",
+            ["Comma separated, decimal point  (1,234.5)",
+             "Semicolon separated, decimal comma  (1;234,5)"], 0, False)
+        if not ok:
+            return
+        locale = "en" if choice.startswith("Comma") else "fr"
+        assert locale in LOCALES
+
+        try:
+            written = write_text(path, signals, locale=locale)
+        except Exception as exc:
+            QMessageBox.critical(self, "Save Text / CSV",
+                                 f"Could not write:\n{exc}")
+            return
+        self.statusBar().showMessage(
+            f"Saved {len(signals)} signal(s) to {written.name} - opens "
+            f"directly in Excel and LibreOffice")
 
     def open_rpc(self) -> None:
         path, _ = QFileDialog.getOpenFileName(

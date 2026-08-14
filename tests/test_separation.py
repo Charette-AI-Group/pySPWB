@@ -43,6 +43,7 @@ def run_clean_import(module: str) -> None:
     "spwb.processing.io.rpc",
     "spwb.processing.io.pch",
     "spwb.processing.io.head_hdf",
+    "spwb.processing.io.text",
 ])
 def test_processing_side_never_imports_qt(module):
     run_clean_import(module)

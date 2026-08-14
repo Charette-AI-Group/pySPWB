@@ -36,6 +36,18 @@ from .tdms import (
     tdms_contents,
     write_tdms,
 )
+from .text import (
+    DELIMITERS,
+    EXCEL_MAX_ROWS,
+    LOCALES,
+    TextColumnInfo,
+    TextFRF,
+    read_text,
+    read_text_frf,
+    split_name_unit,
+    text_contents,
+    write_text,
+)
 from .wave import (
     SAVE_OPTIONS,
     SCALE_KEYWORD,
@@ -50,10 +62,13 @@ from .wave import (
 )
 
 __all__ = [
+    "DELIMITERS",
+    "EXCEL_MAX_ROWS",
     "FORMAT_NAME",
     "FORMAT_VERSION",
     "FRF",
     "LINES_PER_SAMPLE",
+    "LOCALES",
     "SAVE_OPTIONS",
     "SCALE_KEYWORD",
     "SUBTYPES",
@@ -66,6 +81,8 @@ __all__ = [
     "PCHBlockInfo",
     "RPCChannelInfo",
     "RPCHeader",
+    "TextColumnInfo",
+    "TextFRF",
     "WaveInfo",
     "append_source_to_name",
     "hdf5_contents",
@@ -79,13 +96,18 @@ __all__ = [
     "read_rpc",
     "read_rpc_header",
     "read_tdms",
+    "read_text",
+    "read_text_frf",
     "read_wave",
     "read_waves",
     "rpc_contents",
     "scale_filename",
+    "split_name_unit",
     "tdms_contents",
+    "text_contents",
     "wave_contents",
     "write_hdf5",
     "write_tdms",
+    "write_text",
     "write_wave",
 ]

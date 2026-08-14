@@ -11,8 +11,8 @@ LabVIEW application by [Charette AI Group](https://github.com/Charette-AI-Group/
 SPWB is two things, and you can use either without the other:
 
 * a **signal-processing library** — spectra, transfer functions, coherence,
-  spectrograms, HDF5/TDMS/WAV IO plus read-only RPC-III, Nastran punch and
-  HEAD acoustics — that runs happily in a notebook;
+  spectrograms, HDF5/TDMS/WAV/CSV IO plus read-only RPC-III, Nastran
+  punch and HEAD acoustics — that runs happily in a notebook;
 * a **desktop application** built on it, with the multi-window signal
   sharing the original was known for.
 
@@ -38,7 +38,7 @@ src/spwb/
 ├── processing/        the complete Qt-free side — use it in notebooks
 │   ├── model/         Signal (wForm + attributes), SignalStore
 │   ├── dsp/           windows, spectra, transfer functions, metrics
-│   └── io/            file formats (HDF5, TDMS, WAV; read-only:
+│   └── io/            file formats (HDF5, TDMS, WAV, CSV; read-only:
 │                      RPC-III, Nastran punch, HEAD acoustics)
 └── gui/               the PySide6 application — the ONLY package that
                        may import Qt; a pure client of processing/
@@ -110,7 +110,8 @@ ridge = spec.freqs[spec.data.argmax(axis=1)]  # dominant frequency vs time
 | `processing.io.pch` — **read** Nastran punch (`.pch`): block detection, all 3 output flavours, 6 complex components | ✅ read-only, tested |
 | `processing.io.head_hdf` — **read** HEAD acoustics (`.hdf`): native parser, no DataPlugin, any platform | ✅ read-only; verified against 4 real ArtemiS recordings |
 | `gui` — RPC-III and HEAD acoustics import in the Time Processing window | ✅ runs |
-| File IO (text/CSV) | ⬜ next |
+| `processing.io.text` — text/CSV read **and** write, Excel-facing schema, locale separators, text FRF reader | ✅ round-trips exactly |
+| `gui` — Text/CSV open and save in the Time Processing window | ✅ runs |
 
 ## Numerical fidelity
 
@@ -353,6 +354,61 @@ Only single-channel recordings were available, so any other `data org`
 value is **refused with a clear error** rather than de-interleaved on a
 guess. `FLOAT32` is the only `implementation type` seen in the wild; the
 others decode on the same path but are untested against real files.
+
+### Text / CSV, and what "opens in Excel" actually requires
+
+**There is no standard schema for signals in CSV.** RFC 4180 standardises
+the *syntax* — quoting, line endings — and says nothing about units,
+sampling interval or metadata. The domain does have a real interchange
+standard, **UFF-58**, but it is fixed-width ASCII with a coded header that
+Excel opens as gibberish; ASAM ODS/ATFX is XML with the same problem. Both
+are standards for analysis software, not for office software. So "rich
+metadata" and "double-click into Excel" have to be traded off.
+
+Since HDF5 is already the lossless format, **CSV's job here is interchange**,
+and the layout is chosen for that:
+
+```
+# pySPWB text export 1.0
+# signal: {"dt": 0.0001220703125, "n": 245760, "name": "Test", "t0": 0.0, "unit": "Pa", ...}
+Time [s],Test [Pa]
+0.0,0.0
+0.0001220703125,0.6939728856086731
+```
+
+A `#` block carrying one JSON object per signal, then a plain table. Excel
+and LibreOffice open it on a double-click — the `#` rows sit in column A and
+you chart the block underneath — while SPWB reads its own files back
+**exactly**, because units, `dt` and `t0` come from the block instead of
+being re-derived from a rounded time column. `metadata="none"` writes a bare
+table when a downstream tool cannot skip comment lines.
+
+Verified end to end on a real 245 760-sample ArtemiS recording: HDF →
+CSV → back is bit-identical, ~0.8 s each way for a 9 MB file.
+
+**Four things that matter more than the schema**, all handled and all tested:
+
+| | |
+|---|---|
+| **Locale** | A French- or German-locale Excel expects `;` between fields and `,` as the decimal point; a dot-decimal file lands in a single text column there. `locale="fr"` sets both, and the GUI *asks* on export rather than guessing, since the right answer depends on the machine that opens the file |
+| **Row limit** | Excel and LibreOffice both stop at 1 048 576 rows. Writing more raises rather than producing a file they silently truncate — not hypothetical, since the GUI's default rate is 51 200 Hz, so ~20 s overflows |
+| **Precision** | The default is Python's shortest round-trip representation, so a value survives write → read unchanged. SPWB wrote 9 significant digits, which does **not** round-trip a float64; `precision=9` reproduces it |
+| **Encoding** | UTF-8 **with BOM**, because Excel on Windows needs it or `µm/s²` arrives as mojibake |
+
+**Reading files the LabVIEW app wrote** still works: with no `#` block,
+`read_text` falls back to exactly its heuristics — `Signal Start and
+Length.vi`'s NaN scan for header rows, `Find Name and Unit from String.vi`'s
+bracket-first split, `Find T0 and dTt.vi`'s time-column inference, and the
+row-wise transpose rule ("there will always be many more samples than
+signals"). Unit-in-the-header-cell is genuinely ambiguous — SPWB's own
+example signal is `Ref Mic - Exp2010 - Gen I (N1)`, where splitting on `-`
+gives the wrong answer — which is exactly why the metadata block carries the
+unit separately.
+
+Text **FRF** files (`READ - FRF File.vi`) read through `read_text_frf` into
+`TextFRF` objects: complex tokens (`1.5+2.5i`, `4j`) by default, or
+`pairs="real-imag"` / `pairs="mag-phase"` for the two-column-per-curve
+exports other tools produce.
 
 ## Running
 

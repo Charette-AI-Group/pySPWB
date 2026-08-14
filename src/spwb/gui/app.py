@@ -28,11 +28,13 @@ def main(argv: list[str] | None = None) -> int:
         read_head_hdf,
         read_rpc,
         read_tdms,
+        read_text,
         read_wave,
     )
     readers = {".h5": read_hdf5, ".hdf5": read_hdf5,
                ".tdms": read_tdms, ".wav": read_wave,
                ".rsp": read_rpc,
+               ".csv": read_text, ".txt": read_text,
                # HEAD acoustics, not HDF5 - see io/head_hdf.py
                ".hdf": read_head_hdf}
     for path in argv[1:]:
