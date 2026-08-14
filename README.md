@@ -112,6 +112,7 @@ ridge = spec.freqs[spec.data.argmax(axis=1)]  # dominant frequency vs time
 | `gui` — RPC-III and HEAD acoustics import in the Time Processing window | ✅ runs |
 | `processing.io.text` — text/CSV read **and** write, Excel-facing schema, locale separators, text FRF reader | ✅ round-trips exactly |
 | `gui` — Text/CSV open and save in the Time Processing window | ✅ runs |
+| `gui.plotting` — LabVIEW-style graph palette on every plot: pan, rect / X / Y zoom, fit, undo | ✅ runs |
 
 ## Numerical fidelity
 
@@ -423,6 +424,37 @@ On Windows you can instead **double-click `runApp.cmd`**. It prefers a
 the first time, and explains what to do rather than flashing a console
 window and vanishing if something is missing. Dropping data files onto it
 opens them.
+
+### The graph palette
+
+Every plot carries the tool palette SPWB's LabVIEW front panels had: pick a
+tool, then use the mouse directly on the graph.
+
+| | |
+|---|---|
+| **Pan** | drag to move the view |
+| **Zoom** | drag a rectangle to zoom into it |
+| **Zoom X** | drag horizontally — rescales the X axis only, full height |
+| **Zoom Y** | drag vertically — rescales the Y axis only, full width |
+| **± / Fit / Undo** | zoom about the centre, autoscale to the data, step back through zooms |
+
+The X and Y band zooms are implemented in `gui/plotting.py`, because
+pyqtgraph has no such mode — its `RectMode` always rescales both axes
+(`showAxRect` ignores the `mouseEnabled` mask). Selecting a tool also
+constrains the **scroll wheel** to the same axis, since `wheelEvent` reads
+that mask.
+
+Undo is slightly better than pyqtgraph's: it records the view *before* the
+first zoom, which pyqtgraph does not, so the first Undo returns you to where
+you started instead of doing nothing.
+
+The right-click menu is deliberately kept — typing an exact numeric range is
+the one thing a mouse does badly, and that is what the menu is good at.
+
+All five analysis windows share `SpwbPlot`, which also absorbed the plot
+theming that used to be copy-pasted into each of them. It forwards unknown
+attributes to the `PlotWidget` it wraps, so `plot.plot(...)`,
+`plot.setLabel(...)` and the rest are unchanged.
 
 ### Architecture
 

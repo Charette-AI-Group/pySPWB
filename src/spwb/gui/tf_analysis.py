@@ -13,7 +13,7 @@ from __future__ import annotations
 import numpy as np
 import pyqtgraph as pg
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QAction, QGuiApplication, QPalette
+from PySide6.QtGui import QAction, QGuiApplication
 from PySide6.QtWidgets import (
     QAbstractItemView,
     QComboBox,
@@ -43,6 +43,7 @@ from ..processing.model.store import SignalStore
 from .bridge import StoreBridge, WindowManager
 from .dialogs import ImportFromWindowDialog
 from .fft_analysis import _PEN_COLOURS, _WINDOW_LABELS
+from .plotting import SpwbPlot
 
 __all__ = ["TransferFunctionWindow"]
 
@@ -122,18 +123,8 @@ class TransferFunctionWindow(QMainWindow):
         left_layout.addWidget(QLabel("Results"))
         left_layout.addWidget(self.result_list, 1)
 
-        palette = self.palette()
-        bg = palette.color(QPalette.Base)
-        fg = palette.color(QPalette.WindowText)
         pg.setConfigOptions(antialias=True)
-        self.plot = pg.PlotWidget()
-        self.plot.setBackground(bg)
-        for axis in ("bottom", "left"):
-            self.plot.getAxis(axis).setPen(fg)
-            self.plot.getAxis(axis).setTextPen(fg)
-        self.plot.showGrid(x=True, y=True, alpha=0.3)
-        self.plot.setLabel("bottom", "Frequency (Hz)")
-        self.plot.setLabel("left", "Magnitude")
+        self.plot = SpwbPlot("Frequency (Hz)", "Magnitude")
         self.legend = self.plot.addLegend(offset=(-10, 10))
 
         right = QSplitter(Qt.Vertical)

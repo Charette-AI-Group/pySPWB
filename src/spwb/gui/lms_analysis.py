@@ -32,6 +32,7 @@ from ..processing.dsp import adaptive as A
 from ..processing.model.store import SignalStore
 from .bridge import StoreBridge, WindowManager
 from .dialogs import ImportFromWindowDialog
+from .plotting import SpwbPlot
 
 __all__ = ["LMSWindow"]
 
@@ -104,16 +105,8 @@ class LMSWindow(QMainWindow):
         self.statusBar().showMessage(
             "Import two signals, pick their roles, then Run")
 
-    def _plot(self, x_label: str, y_label: str) -> pg.PlotWidget:
-        plot = pg.PlotWidget()
-        plot.setBackground(self._bg)
-        for axis in ("bottom", "left"):
-            plot.getAxis(axis).setPen(self._fg)
-            plot.getAxis(axis).setTextPen(self._fg)
-        plot.showGrid(x=True, y=True, alpha=0.3)
-        plot.setLabel("bottom", x_label)
-        plot.setLabel("left", y_label)
-        return plot
+    def _plot(self, x_label: str, y_label: str) -> SpwbPlot:
+        return SpwbPlot(x_label, y_label)
 
     @staticmethod
     def _titled(title: str, widget: QWidget) -> QWidget:

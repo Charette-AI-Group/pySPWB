@@ -34,6 +34,7 @@ from ..processing.model.store import SignalStore
 from .bridge import StoreBridge, WindowManager
 from .dialogs import ImportFromWindowDialog
 from .fft_analysis import _WINDOW_LABELS
+from .plotting import SpwbPlot
 
 __all__ = ["TimeFrequencyWindow"]
 
@@ -136,16 +137,8 @@ class TimeFrequencyWindow(QMainWindow):
         self.setCentralWidget(body)
         self.statusBar().showMessage("Import a signal to analyse")
 
-    def _make_plot(self, x_label: str, y_label: str) -> pg.PlotWidget:
-        plot = pg.PlotWidget()
-        plot.setBackground(self._bg)
-        for axis in ("bottom", "left"):
-            plot.getAxis(axis).setPen(self._fg)
-            plot.getAxis(axis).setTextPen(self._fg)
-        plot.showGrid(x=True, y=True, alpha=0.3)
-        plot.setLabel("bottom", x_label)
-        plot.setLabel("left", y_label)
-        return plot
+    def _make_plot(self, x_label: str, y_label: str) -> SpwbPlot:
+        return SpwbPlot(x_label, y_label)
 
     @staticmethod
     def _titled(title: str, widget: QWidget) -> QWidget:

@@ -16,7 +16,7 @@ from pathlib import Path
 
 import pyqtgraph as pg
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QAction, QKeySequence, QPalette
+from PySide6.QtGui import QAction, QKeySequence
 from PySide6.QtWidgets import (
     QAbstractItemView,
     QFileDialog,
@@ -41,6 +41,7 @@ from ..processing.model.store import SignalStore
 from .analysis_tabs import ScaleSignalsTab, StatsTab, TVMetricsTab
 from .bridge import StoreBridge, WindowManager
 from .dialogs import ChannelSelectDialog, CreateSignalDialog, ImportFromWindowDialog
+from .plotting import SpwbPlot
 
 __all__ = ["TimeProcessingWindow"]
 
@@ -112,17 +113,8 @@ class TimeProcessingWindow(QMainWindow):
         left_layout.addWidget(QLabel("Attributes"))
         left_layout.addWidget(self.details)
 
-        # follow the application palette so the plot matches light/dark themes
-        palette = self.palette()
-        bg = palette.color(QPalette.Base)
-        fg = palette.color(QPalette.WindowText)
         pg.setConfigOptions(antialias=True)
-        self.plot = pg.PlotWidget()
-        self.plot.setBackground(bg)
-        for axis in ("bottom", "left"):
-            self.plot.getAxis(axis).setPen(fg)
-            self.plot.getAxis(axis).setTextPen(fg)
-        self.plot.showGrid(x=True, y=True, alpha=0.3)
+        self.plot = SpwbPlot()
         self.plot.setLabel("bottom", "Time", units="s")
         self.plot.setLabel("left", "Amplitude")
         self.legend = self.plot.addLegend(offset=(-10, 10))
