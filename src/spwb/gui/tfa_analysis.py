@@ -78,7 +78,6 @@ class TimeFrequencyWindow(QMainWindow):
         palette = self.palette()
         self._bg = palette.color(QPalette.Base)
         self._fg = palette.color(QPalette.WindowText)
-        pg.setConfigOptions(antialias=True)
 
         self.channel = QComboBox()
         self.channel.currentIndexChanged.connect(self.recompute)

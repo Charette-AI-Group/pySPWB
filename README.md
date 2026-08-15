@@ -452,6 +452,19 @@ you started instead of doing nothing.
 The right-click menu is deliberately kept — typing an exact numeric range is
 the one thing a mouse does badly, and that is what the menu is good at.
 
+**Antialiasing is off, and that is a performance decision, not a taste one.**
+Qt's raster engine has a fast path for 1px cosmetic pens only; a 2px
+*antialiased* polyline of 245 760 points (30 s at 8192 Hz) took **6.4 s to
+paint, per redraw**. Aliased it takes 0.21 s, and with peak downsampling
+0.04 s — faster than the 1px antialiased curve it replaced. At 2px the
+stair-stepping is barely visible, and on dense waveform data it is invisible.
+
+Plots also draw at most a couple of points per screen pixel, in `peak` mode
+so the envelope and any transient survive (a plain stride would drop them);
+zooming in re-renders from the full data. `setClipToView` is deliberately
+*not* set — it makes a curve report only the data inside the view, which
+stops autoscale seeing the rest, and measuring showed it buys nothing.
+
 Data traces are drawn at `CURVE_WIDTH` (2px) against the 1px grid and axes.
 At equal width a trace reads as part of the background rather than as the
 measurement. Whole pixels on purpose — a fractional width antialiases into a

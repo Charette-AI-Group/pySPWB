@@ -65,7 +65,6 @@ class LMSWindow(QMainWindow):
         palette = self.palette()
         self._bg = palette.color(QPalette.Base)
         self._fg = palette.color(QPalette.WindowText)
-        pg.setConfigOptions(antialias=True)
 
         self.reference_box = QComboBox()
         self.noisy_box = QComboBox()

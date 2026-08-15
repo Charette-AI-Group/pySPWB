@@ -11,7 +11,6 @@ the LabVIEW original had to drive this through its state machine.
 """
 from __future__ import annotations
 
-import pyqtgraph as pg
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QAction, QGuiApplication
 from PySide6.QtWidgets import (
@@ -117,7 +116,6 @@ class FFTWindow(QMainWindow):
         left_layout.addWidget(self.tree, 1)
         left_layout.addLayout(row)
 
-        pg.setConfigOptions(antialias=True)
         # plain label, not units="Hz": pyqtgraph's SI auto-prefixing rescales
         # to kHz and makes the log-frequency ticks unreadable
         self.plot = SpwbPlot("Frequency (Hz)", "Amplitude")

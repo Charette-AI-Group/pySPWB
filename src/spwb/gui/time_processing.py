@@ -14,7 +14,6 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import pyqtgraph as pg
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QAction, QKeySequence
 from PySide6.QtWidgets import (
@@ -110,7 +109,6 @@ class TimeProcessingWindow(QMainWindow):
         left_layout.addWidget(QLabel("Attributes"))
         left_layout.addWidget(self.details)
 
-        pg.setConfigOptions(antialias=True)
         self.plot = SpwbPlot()
         self.plot.setLabel("bottom", "Time", units="s")
         self.plot.setLabel("left", "Amplitude")

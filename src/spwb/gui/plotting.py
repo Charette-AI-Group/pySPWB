@@ -47,6 +47,21 @@ from PySide6.QtWidgets import (
 __all__ = ["CURVE_WIDTH", "PEN_COLOURS", "TOOLS", "GraphViewBox", "SpwbPlot",
            "curve_pen"]
 
+# Antialiasing is off, deliberately, and it is not a cosmetic preference.
+# Qt's raster engine has a fast path for 1px cosmetic pens; any wider pen
+# drawn antialiased falls off a cliff on long polylines. Measured on one
+# 30-second signal at 8192 Hz (245 760 points), time to paint:
+#
+#     antialiased, 1px ....  0.07 s
+#     antialiased, 2px ....  6.42 s     <- 94x, and it is per redraw
+#     aliased,     2px ....  0.21 s
+#     aliased,     2px + peak downsampling ....  0.04 s
+#
+# Curves are 2px so they stand out from the grid, so antialiasing had to
+# go. At 2px the stair-stepping is barely visible, and on dense waveform
+# data it is invisible.
+pg.setConfigOptions(antialias=False)
+
 #: Data curves are drawn thicker than the grid and axes, which pyqtgraph
 #: draws 1px wide. At the same width a trace reads as part of the
 #: background grid rather than as the measurement; 2px separates them
@@ -272,6 +287,16 @@ class SpwbPlot(QWidget):
             self.plot_widget.getAxis(axis).setPen(self._fg)
             self.plot_widget.getAxis(axis).setTextPen(self._fg)
         self.plot_widget.showGrid(x=True, y=True, alpha=0.3)
+        # Draw at most a couple of points per screen pixel. "peak" keeps the
+        # minimum and maximum of each bin, so the envelope and any transient
+        # survive - a plain stride would drop them. Zooming in re-renders
+        # from the full data, so nothing is lost, only not drawn.
+        #
+        # Note the matching setClipToView is deliberately *not* set: it makes
+        # a curve report only the data inside the current view, which breaks
+        # autoscale (the Fit button cannot see past the edges), and measuring
+        # showed it contributes nothing here - downsampling alone is the win.
+        self.plot_widget.plotItem.setDownsampling(auto=True, mode="peak")
         if x_label:
             self.plot_widget.setLabel("bottom", x_label)
         if y_label:

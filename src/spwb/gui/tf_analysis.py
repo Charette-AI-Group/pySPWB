@@ -11,7 +11,6 @@ which keeps the assignment visible next to the data it applies to.
 from __future__ import annotations
 
 import numpy as np
-import pyqtgraph as pg
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QAction, QGuiApplication
 from PySide6.QtWidgets import (
@@ -123,7 +122,6 @@ class TransferFunctionWindow(QMainWindow):
         left_layout.addWidget(QLabel("Results"))
         left_layout.addWidget(self.result_list, 1)
 
-        pg.setConfigOptions(antialias=True)
         self.plot = SpwbPlot("Frequency (Hz)", "Magnitude")
         self.legend = self.plot.addLegend(offset=(-10, 10))
 

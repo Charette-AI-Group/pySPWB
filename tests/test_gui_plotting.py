@@ -321,6 +321,55 @@ def test_the_palette_can_be_hidden(plot):
     assert plot.toolbar.isVisible()
 
 
+# -- the settings that keep long signals fast ------------------------------
+def test_curves_are_thicker_than_the_grid(plot):
+    from spwb.gui.plotting import CURVE_WIDTH, curve_pen
+
+    assert CURVE_WIDTH > 1                       # the grid and axes are 1px
+    assert curve_pen(0).width() == CURVE_WIDTH
+    assert curve_pen("#123456").color().name() == "#123456"
+    assert curve_pen(len(__import__(
+        "spwb.gui.plotting", fromlist=["PEN_COLOURS"]).PEN_COLOURS)) is not None
+
+
+def test_antialiasing_is_off_and_downsampling_is_on(plot):
+    """The pairing that makes a 30-second signal paint in 40 ms.
+
+    Qt has a fast path for 1px cosmetic pens only; a 2px *antialiased*
+    polyline of 245k points took 6.4 s to paint, per redraw. Turning
+    antialiasing off and letting pyqtgraph draw at most a couple of points
+    per pixel brings it to 0.04 s. If someone turns antialiasing back on
+    for looks, the application becomes unusable on real recordings - hence
+    this test rather than a comment.
+    """
+    assert pg.getConfigOption("antialias") is False
+
+    control = plot.plotItem.ctrl
+    assert control.downsampleCheck.isChecked()
+    assert control.autoDownsampleCheck.isChecked()
+    assert control.peakRadio.isChecked()      # keeps transients, unlike stride
+    # clipToView must stay OFF: it makes a curve report only the data inside
+    # the view, so autoscale can no longer see the rest, and it buys no speed
+    assert not control.clipToViewCheck.isChecked()
+
+
+def test_a_long_signal_paints_promptly(plot, qapp):
+    """A crude ceiling, but it would have caught the 6-second regression."""
+    import time
+
+    n = 245_760                                  # 30 s at 8192 Hz
+    t = np.arange(n) / 8192.0
+    plot.clear()
+    plot.plot(t, np.sin(2 * np.pi * 100 * t), pen=None)
+    qapp.processEvents()
+
+    start = time.perf_counter()
+    plot.grab()                                  # forces a synchronous repaint
+    elapsed = time.perf_counter() - start
+
+    assert elapsed < 2.0, f"painting {n} points took {elapsed:.2f} s"
+
+
 def test_the_right_click_menu_is_kept_as_the_exact_range_escape_hatch(plot):
     """Typing a precise range is the one thing the palette cannot do."""
     assert plot.plotItem.vb.menu is not None
