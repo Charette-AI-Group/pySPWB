@@ -34,7 +34,7 @@ from ..processing.model.store import SignalStore
 from .bridge import StoreBridge, WindowManager
 from .dialogs import ImportFromWindowDialog
 from .fft_analysis import _WINDOW_LABELS
-from .plotting import SpwbPlot
+from .plotting import SpwbPlot, curve_pen
 
 __all__ = ["TimeFrequencyWindow"]
 
@@ -91,9 +91,9 @@ class TimeFrequencyWindow(QMainWindow):
             self.image, colorMap="CET-R4", interactive=False)
 
         self.v_line = pg.InfiniteLine(angle=90, movable=True,
-                                      pen=pg.mkPen("#ffcc00", width=1))
+                                      pen=curve_pen("#ffcc00"))
         self.h_line = pg.InfiniteLine(angle=0, movable=True,
-                                      pen=pg.mkPen("#ffcc00", width=1))
+                                      pen=curve_pen("#ffcc00"))
         self.image_plot.addItem(self.v_line)
         self.image_plot.addItem(self.h_line)
         self.v_line.sigPositionChanged.connect(self._update_sections)
@@ -106,9 +106,9 @@ class TimeFrequencyWindow(QMainWindow):
         self.time_section_plot = self._make_plot("Frequency (Hz)", "Amplitude")
         self.freq_section_plot = self._make_plot("Time (sec)", "Amplitude")
         self.time_curve = self.time_section_plot.plot(
-            pen=pg.mkPen("#1f77b4", width=1))
+            pen=curve_pen("#1f77b4"))
         self.freq_curve = self.freq_section_plot.plot(
-            pen=pg.mkPen("#d62728", width=1))
+            pen=curve_pen("#d62728"))
 
         sections = QSplitter(Qt.Horizontal)
         sections.addWidget(self._titled("Time Section (spectrum at cursor)",

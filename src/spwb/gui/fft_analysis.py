@@ -42,12 +42,12 @@ from ..processing.model.signal import Signal
 from ..processing.model.store import SignalStore
 from .bridge import StoreBridge, WindowManager
 from .dialogs import ImportFromWindowDialog
-from .plotting import SpwbPlot
+from .plotting import PEN_COLOURS, SpwbPlot, curve_pen
 
 __all__ = ["FFTWindow"]
 
-_PEN_COLOURS = ("#1f77b4", "#d62728", "#2ca02c", "#ff7f0e", "#9467bd",
-                "#8c564b", "#e377c2", "#17becf", "#bcbd22", "#7f7f7f")
+#: kept as an alias: tf_analysis imports the cycle from here
+_PEN_COLOURS = PEN_COLOURS
 
 # window names as the SPWB menu spelled them
 _WINDOW_LABELS = {
@@ -385,8 +385,7 @@ class FFTWindow(QMainWindow):
             if log_x:
                 # log10(0 Hz) is -inf; drop the DC bin as analysers do
                 freqs, values = freqs[1:], values[1:]
-            pen = pg.mkPen(_PEN_COLOURS[i % len(_PEN_COLOURS)], width=1)
-            self.plot.plot(freqs, values, pen=pen, name=spec.name)
+            self.plot.plot(freqs, values, pen=curve_pen(i), name=spec.name)
             units.add(spec.y_unit)
         label = units.pop() if len(units) == 1 else "Amplitude"
         self.plot.setLabel("left", label)

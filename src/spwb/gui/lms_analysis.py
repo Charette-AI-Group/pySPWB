@@ -32,7 +32,7 @@ from ..processing.dsp import adaptive as A
 from ..processing.model.store import SignalStore
 from .bridge import StoreBridge, WindowManager
 from .dialogs import ImportFromWindowDialog
-from .plotting import SpwbPlot
+from .plotting import SpwbPlot, curve_pen
 
 __all__ = ["LMSWindow"]
 
@@ -278,15 +278,15 @@ class LMSWindow(QMainWindow):
         self._clear_plots()
 
         self.signal_plot.plot(noisy.t, noisy.y,
-                              pen=pg.mkPen("#d62728", width=1), name="noisy")
+                              pen=curve_pen("#d62728"), name="noisy")
         self.signal_plot.plot(result.filtered.t, result.filtered.y,
-                              pen=pg.mkPen("#1f77b4", width=1),
+                              pen=curve_pen("#1f77b4"),
                               name="filtered")
         self.signal_plot.setLabel("left", f"Amplitude ({noisy.y_unit})"
                                   if noisy.y_unit else "Amplitude")
 
         self.convergence_plot.plot(result.block_times, result.convergence,
-                                   pen=pg.mkPen("#2ca02c", width=1),
+                                   pen=curve_pen("#2ca02c"),
                                    symbol="o", symbolSize=4)
         floor = pg.InfiniteLine(pos=result.noise_floor, angle=0,
                                 pen=pg.mkPen("#888888", style=Qt.DotLine))

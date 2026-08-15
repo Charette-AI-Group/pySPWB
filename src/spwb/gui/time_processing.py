@@ -41,13 +41,10 @@ from . import settings
 from .analysis_tabs import ScaleSignalsTab, StatsTab, TVMetricsTab
 from .bridge import StoreBridge, WindowManager
 from .dialogs import ChannelSelectDialog, CreateSignalDialog, ImportFromWindowDialog
-from .plotting import SpwbPlot
+from .plotting import SpwbPlot, curve_pen
 
 __all__ = ["TimeProcessingWindow"]
 
-# colour cycle for the plot traces
-_PEN_COLOURS = ("#1f77b4", "#d62728", "#2ca02c", "#ff7f0e", "#9467bd",
-                "#8c564b", "#e377c2", "#17becf", "#bcbd22", "#7f7f7f")
 
 
 class TimeProcessingWindow(QMainWindow):
@@ -299,8 +296,7 @@ class TimeProcessingWindow(QMainWindow):
             self.legend.clear()
         units = set()
         for i, sig in enumerate(self._visible_signals()):
-            pen = pg.mkPen(_PEN_COLOURS[i % len(_PEN_COLOURS)], width=1)
-            self.plot.plot(sig.t, sig.y, pen=pen, name=sig.name)
+            self.plot.plot(sig.t, sig.y, pen=curve_pen(i), name=sig.name)
             if sig.y_unit:
                 units.add(sig.y_unit)
         label = units.pop() if len(units) == 1 else ""

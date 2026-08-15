@@ -42,8 +42,8 @@ from ..processing.model.signal import Signal
 from ..processing.model.store import SignalStore
 from .bridge import StoreBridge, WindowManager
 from .dialogs import ImportFromWindowDialog
-from .fft_analysis import _PEN_COLOURS, _WINDOW_LABELS
-from .plotting import SpwbPlot
+from .fft_analysis import _WINDOW_LABELS
+from .plotting import SpwbPlot, curve_pen
 
 __all__ = ["TransferFunctionWindow"]
 
@@ -360,8 +360,7 @@ class TransferFunctionWindow(QMainWindow):
             freqs, values = shown.t, shown.y
             if log_x:
                 freqs, values = freqs[1:], values[1:]   # log10(0 Hz) = -inf
-            pen = pg.mkPen(_PEN_COLOURS[i % len(_PEN_COLOURS)], width=1)
-            self.plot.plot(freqs, values, pen=pen, name=shown.name)
+            self.plot.plot(freqs, values, pen=curve_pen(i), name=shown.name)
             units.add(shown.y_unit)
         label = units.pop() if len(units) == 1 else ""
         self.plot.setLabel("left", f"{display} {f'({label})' if label else ''}")

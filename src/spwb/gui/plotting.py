@@ -44,7 +44,33 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-__all__ = ["TOOLS", "GraphViewBox", "SpwbPlot"]
+__all__ = ["CURVE_WIDTH", "PEN_COLOURS", "TOOLS", "GraphViewBox", "SpwbPlot",
+           "curve_pen"]
+
+#: Data curves are drawn thicker than the grid and axes, which pyqtgraph
+#: draws 1px wide. At the same width a trace reads as part of the
+#: background grid rather than as the measurement; 2px separates them
+#: cleanly without looking heavy. Whole pixels on purpose - a fractional
+#: width antialiases into a soft grey edge on a non-HiDPI screen.
+CURVE_WIDTH = 2
+
+#: the trace colour cycle, shared by every window so the same signal keeps
+#: its colour when it is sent from one to another
+PEN_COLOURS: tuple[str, ...] = (
+    "#1f77b4", "#d62728", "#2ca02c", "#ff7f0e", "#9467bd",
+    "#8c564b", "#e377c2", "#17becf", "#bcbd22", "#7f7f7f",
+)
+
+
+def curve_pen(colour: str | int, width: int | float = CURVE_WIDTH, **kwargs):
+    """A pen for a data trace: thicker than the grid, so it stands out.
+
+    ``colour`` may be a colour string or an index into :data:`PEN_COLOURS`,
+    which wraps, so callers can pass a plain loop counter.
+    """
+    if isinstance(colour, int):
+        colour = PEN_COLOURS[colour % len(PEN_COLOURS)]
+    return pg.mkPen(colour, width=width, **kwargs)
 
 #: tool id -> (label, tooltip). The first four are drag tools and are
 #: mutually exclusive; the rest are one-shot buttons.
