@@ -44,8 +44,8 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-__all__ = ["CURVE_WIDTH", "PEN_COLOURS", "TOOLS", "GraphViewBox", "SpwbPlot",
-           "curve_pen"]
+__all__ = ["CURVE_WIDTH", "GRID_ALPHA", "PEN_COLOURS", "TOOLS",
+           "GraphViewBox", "SpwbPlot", "curve_pen"]
 
 # Antialiasing is off, deliberately, and it is not a cosmetic preference.
 # Qt's raster engine has a fast path for 1px cosmetic pens; any wider pen
@@ -68,6 +68,10 @@ pg.setConfigOptions(antialias=False)
 #: cleanly without looking heavy. Whole pixels on purpose - a fractional
 #: width antialiases into a soft grey edge on a non-HiDPI screen.
 CURVE_WIDTH = 2
+
+#: Grid opacity. Kept low so the grid reads as a background reference and
+#: the traces sit in front of it; it still gives the eye a scale.
+GRID_ALPHA = 0.2
 
 #: the trace colour cycle, shared by every window so the same signal keeps
 #: its colour when it is sent from one to another
@@ -286,7 +290,9 @@ class SpwbPlot(QWidget):
         for axis in ("bottom", "left"):
             self.plot_widget.getAxis(axis).setPen(self._fg)
             self.plot_widget.getAxis(axis).setTextPen(self._fg)
-        self.plot_widget.showGrid(x=True, y=True, alpha=0.3)
+        # Light enough that the traces sit in front of it rather than
+        # competing with it - the other half of drawing curves at 2px.
+        self.plot_widget.showGrid(x=True, y=True, alpha=GRID_ALPHA)
         # Draw at most a couple of points per screen pixel. "peak" keeps the
         # minimum and maximum of each bin, so the envelope and any transient
         # survive - a plain stride would drop them. Zooming in re-renders

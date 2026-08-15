@@ -469,7 +469,9 @@ Data traces are drawn at `CURVE_WIDTH` (2px) against the 1px grid and axes.
 At equal width a trace reads as part of the background rather than as the
 measurement. Whole pixels on purpose — a fractional width antialiases into a
 soft grey edge on a non-HiDPI screen. Every window builds its pens with
-`curve_pen()`, so the width and the colour cycle are set in one place.
+`curve_pen()`, so the width and the colour cycle are set in one place. The
+grid sits at `GRID_ALPHA` (0.2) — light enough to read as a background
+reference rather than competing with the traces.
 
 All five analysis windows share `SpwbPlot`, which also absorbed the plot
 theming that used to be copy-pasted into each of them. It forwards unknown
