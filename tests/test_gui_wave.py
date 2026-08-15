@@ -86,7 +86,7 @@ def test_bad_file_is_reported_not_crashed(window, tmp_path, monkeypatch):
 # -- saving ------------------------------------------------------------------
 def _save(window, monkeypatch, tmp_path, name, option=None):
     monkeypatch.setattr(
-        "spwb.gui.time_processing.QFileDialog.getSaveFileName",
+        "spwb.gui.settings.QFileDialog.getSaveFileName",
         lambda *a, **k: (str(tmp_path / name), ""))
     if option is not None:
         monkeypatch.setattr(

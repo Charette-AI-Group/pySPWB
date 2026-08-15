@@ -61,9 +61,9 @@ def rpc_file(tmp_path):
 
 def test_open_rpc_imports_every_channel(window, rpc_file, accept_dialogs,
                                         monkeypatch):
-    from spwb.gui import time_processing as TP
+    from spwb.gui import settings as SETTINGS
 
-    monkeypatch.setattr(TP.QFileDialog, "getOpenFileName",
+    monkeypatch.setattr(SETTINGS.QFileDialog, "getOpenFileName",
                         staticmethod(lambda *a, **k: (str(rpc_file), "")))
 
     window.open_rpc()
@@ -77,11 +77,12 @@ def test_open_rpc_imports_every_channel(window, rpc_file, accept_dialogs,
 
 def test_open_rpc_reports_a_bad_file_instead_of_raising(window, tmp_path,
                                                         monkeypatch):
+    from spwb.gui import settings as SETTINGS
     from spwb.gui import time_processing as TP
 
     junk = tmp_path / "notes.rsp"
     junk.write_bytes(b"not an RPC file" + b"\x00" * 512)
-    monkeypatch.setattr(TP.QFileDialog, "getOpenFileName",
+    monkeypatch.setattr(SETTINGS.QFileDialog, "getOpenFileName",
                         staticmethod(lambda *a, **k: (str(junk), "")))
     shown = []
     monkeypatch.setattr(TP.QMessageBox, "critical",
@@ -95,11 +96,11 @@ def test_open_rpc_reports_a_bad_file_instead_of_raising(window, tmp_path,
 
 def test_open_head_hdf_imports_a_recording(window, tmp_path, accept_dialogs,
                                            monkeypatch):
-    from spwb.gui import time_processing as TP
+    from spwb.gui import settings as SETTINGS
 
     path = build_hdf(tmp_path / "Sine 1kHz.hdf",
                      [("Test", "Pa", "pressure", sine())])
-    monkeypatch.setattr(TP.QFileDialog, "getOpenFileName",
+    monkeypatch.setattr(SETTINGS.QFileDialog, "getOpenFileName",
                         staticmethod(lambda *a, **k: (str(path), "")))
 
     window.open_head_hdf()
@@ -113,11 +114,12 @@ def test_open_head_hdf_imports_a_recording(window, tmp_path, accept_dialogs,
 def test_open_head_hdf_reports_a_bad_file_instead_of_raising(window, tmp_path,
                                                              monkeypatch):
     """An HDF5 file with the colliding extension must not misread silently."""
+    from spwb.gui import settings as SETTINGS
     from spwb.gui import time_processing as TP
 
     path = tmp_path / "confusing.hdf"
     path.write_bytes(b"\x89HDF\r\n\x1a\n" + b"\x00" * 512)
-    monkeypatch.setattr(TP.QFileDialog, "getOpenFileName",
+    monkeypatch.setattr(SETTINGS.QFileDialog, "getOpenFileName",
                         staticmethod(lambda *a, **k: (str(path), "")))
     shown = []
     monkeypatch.setattr(TP.QMessageBox, "critical",
@@ -132,11 +134,12 @@ def test_open_head_hdf_reports_a_bad_file_instead_of_raising(window, tmp_path,
 def test_text_export_asks_which_number_format_excel_expects(window, tmp_path,
                                                             monkeypatch):
     """The right answer depends on the machine that opens the file."""
+    from spwb.gui import settings as SETTINGS
     from spwb.gui import time_processing as TP
 
     window.store.add(Signal("Accel", np.arange(16.0), 0.001, y_unit="m/s^2"))
     out = tmp_path / "export.csv"
-    monkeypatch.setattr(TP.QFileDialog, "getSaveFileName",
+    monkeypatch.setattr(SETTINGS.QFileDialog, "getSaveFileName",
                         staticmethod(lambda *a, **k: (str(out), "")))
     asked = []
 
@@ -156,18 +159,19 @@ def test_text_export_asks_which_number_format_excel_expects(window, tmp_path,
 
 def test_text_export_then_import_round_trips_through_the_window(
         window, tmp_path, accept_dialogs, monkeypatch):
+    from spwb.gui import settings as SETTINGS
     from spwb.gui import time_processing as TP
 
     original = Signal("Accel", np.arange(16.0), 0.001, y_unit="m/s^2")
     window.store.add(original)
     out = tmp_path / "rt.csv"
-    monkeypatch.setattr(TP.QFileDialog, "getSaveFileName",
+    monkeypatch.setattr(SETTINGS.QFileDialog, "getSaveFileName",
                         staticmethod(lambda *a, **k: (str(out), "")))
     monkeypatch.setattr(TP.QInputDialog, "getItem", staticmethod(
         lambda *a, **k: ("Comma separated, decimal point  (1,234.5)", True)))
     window.save_text()
 
-    monkeypatch.setattr(TP.QFileDialog, "getOpenFileName",
+    monkeypatch.setattr(SETTINGS.QFileDialog, "getOpenFileName",
                         staticmethod(lambda *a, **k: (str(out), "")))
     window.open_text()
 
@@ -179,11 +183,12 @@ def test_text_export_then_import_round_trips_through_the_window(
 
 def test_cancelling_the_number_format_writes_nothing(window, tmp_path,
                                                      monkeypatch):
+    from spwb.gui import settings as SETTINGS
     from spwb.gui import time_processing as TP
 
     window.store.add(Signal("Accel", np.arange(8.0), 0.001))
     out = tmp_path / "cancelled.csv"
-    monkeypatch.setattr(TP.QFileDialog, "getSaveFileName",
+    monkeypatch.setattr(SETTINGS.QFileDialog, "getSaveFileName",
                         staticmethod(lambda *a, **k: (str(out), "")))
     monkeypatch.setattr(TP.QInputDialog, "getItem",
                         staticmethod(lambda *a, **k: ("", False)))
@@ -194,9 +199,10 @@ def test_cancelling_the_number_format_writes_nothing(window, tmp_path,
 
 
 def test_cancelling_the_picker_imports_nothing(window, rpc_file, monkeypatch):
+    from spwb.gui import settings as SETTINGS
     from spwb.gui import time_processing as TP
 
-    monkeypatch.setattr(TP.QFileDialog, "getOpenFileName",
+    monkeypatch.setattr(SETTINGS.QFileDialog, "getOpenFileName",
                         staticmethod(lambda *a, **k: (str(rpc_file), "")))
     monkeypatch.setattr(TP.ChannelSelectDialog, "exec",
                         lambda self: QDialog.Rejected)

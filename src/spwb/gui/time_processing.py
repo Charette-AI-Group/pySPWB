@@ -19,7 +19,6 @@ from PySide6.QtCore import Qt
 from PySide6.QtGui import QAction, QKeySequence
 from PySide6.QtWidgets import (
     QAbstractItemView,
-    QFileDialog,
     QHBoxLayout,
     QHeaderView,
     QInputDialog,
@@ -38,6 +37,7 @@ from PySide6.QtWidgets import (
 
 from ..processing.model.signal import Signal
 from ..processing.model.store import SignalStore
+from . import settings
 from .analysis_tabs import ScaleSignalsTab, StatsTab, TVMetricsTab
 from .bridge import StoreBridge, WindowManager
 from .dialogs import ChannelSelectDialog, CreateSignalDialog, ImportFromWindowDialog
@@ -343,8 +343,8 @@ class TimeProcessingWindow(QMainWindow):
 
     # -- actions -------------------------------------------------------------
     def open_tdms(self) -> None:
-        path, _ = QFileDialog.getOpenFileName(
-            self, "Open TDMS File", "", "National Instruments (*.tdms)")
+        path = settings.open_file(
+            self, "Open TDMS File", "tdms", "National Instruments (*.tdms)")
         if not path:
             return
         try:
@@ -389,8 +389,8 @@ class TimeProcessingWindow(QMainWindow):
         if not len(self.store):
             QMessageBox.information(self, "Save TDMS", "No signals to save.")
             return
-        path, _ = QFileDialog.getSaveFileName(
-            self, "Save TDMS File", "", "National Instruments (*.tdms)")
+        path = settings.save_file(
+            self, "Save TDMS File", "tdms", "National Instruments (*.tdms)")
         if not path:
             return
         try:
@@ -403,8 +403,8 @@ class TimeProcessingWindow(QMainWindow):
                                      f"to {Path(path).name}")
 
     def open_text(self) -> None:
-        path, _ = QFileDialog.getOpenFileName(
-            self, "Open Text / CSV File", "",
+        path = settings.open_file(
+            self, "Open Text / CSV File", "text",
             "Text and CSV (*.csv *.txt *.dat *.asc);;All files (*)")
         if not path:
             return
@@ -419,8 +419,9 @@ class TimeProcessingWindow(QMainWindow):
             QMessageBox.information(self, "Save Text / CSV",
                                     "No signals to save.")
             return
-        path, _ = QFileDialog.getSaveFileName(
-            self, "Save Text / CSV File", "", "CSV (*.csv);;Text (*.txt)")
+        path = settings.save_file(
+            self, "Save Text / CSV File", "text",
+            "CSV (*.csv);;Text (*.txt)")
         if not path:
             return
         from ..processing.io import LOCALES, write_text
@@ -450,8 +451,8 @@ class TimeProcessingWindow(QMainWindow):
             f"directly in Excel and LibreOffice")
 
     def open_rpc(self) -> None:
-        path, _ = QFileDialog.getOpenFileName(
-            self, "Open RPC-III File", "",
+        path = settings.open_file(
+            self, "Open RPC-III File", "rpc",
             "MTS RPC-III (*.rsp);;All files (*)")
         if not path:
             return
@@ -460,8 +461,8 @@ class TimeProcessingWindow(QMainWindow):
         self._import_channels("Open RPC-III", path, rpc_contents, read_rpc)
 
     def open_head_hdf(self) -> None:
-        path, _ = QFileDialog.getOpenFileName(
-            self, "Open HEAD acoustics File", "",
+        path = settings.open_file(
+            self, "Open HEAD acoustics File", "head_hdf",
             "HEAD acoustics (*.hdf);;All files (*)")
         if not path:
             return
@@ -514,8 +515,8 @@ class TimeProcessingWindow(QMainWindow):
             f"Imported {len(signals)} signal(s) from {Path(path).name}")
 
     def open_hdf5(self) -> None:
-        path, _ = QFileDialog.getOpenFileName(
-            self, "Open SPWB / HDF5 File", "",
+        path = settings.open_file(
+            self, "Open SPWB / HDF5 File", "hdf5",
             "SPWB / HDF5 (*.h5 *.hdf5);;All files (*)")
         if not path:
             return
@@ -537,8 +538,8 @@ class TimeProcessingWindow(QMainWindow):
         if not signals:
             QMessageBox.information(self, "Save HDF5", "No signals to save.")
             return
-        path, _ = QFileDialog.getSaveFileName(
-            self, "Save SPWB / HDF5 File", "", "SPWB / HDF5 (*.h5)")
+        path = settings.save_file(
+            self, "Save SPWB / HDF5 File", "hdf5", "SPWB / HDF5 (*.h5)")
         if not path:
             return
         from ..processing.io import write_hdf5
@@ -554,14 +555,15 @@ class TimeProcessingWindow(QMainWindow):
             f"MATLAB, Julia and any HDF5 tool")
 
     def open_wave(self) -> None:
-        path, _ = QFileDialog.getOpenFileName(
-            self, "Open Wave File", "", "Wave Files (*.wav)")
+        path = settings.open_file(
+            self, "Open Wave File", "wave", "Wave Files (*.wav)")
         if path:
             self._load_waves([path])
 
     def open_multiple_waves(self) -> None:
-        paths, _ = QFileDialog.getOpenFileNames(
-            self, "Select Multiple Wave Files", "", "Wave Files (*.wav)")
+        paths = settings.open_files(
+            self, "Select Multiple Wave Files", "wave",
+            "Wave Files (*.wav)")
         if paths:
             self._load_waves(paths)
 
@@ -614,8 +616,8 @@ class TimeProcessingWindow(QMainWindow):
             if not ok:
                 return
 
-        path, _ = QFileDialog.getSaveFileName(
-            self, "Save Wave File", "", "Wave Files (*.wav)")
+        path = settings.save_file(
+            self, "Save Wave File", "wave", "Wave Files (*.wav)")
         if not path:
             return
         try:

@@ -54,7 +54,7 @@ def test_save_and_reload_through_the_window(window, monkeypatch, tmp_path):
     window.store.add(original)
 
     monkeypatch.setattr(
-        "spwb.gui.time_processing.QFileDialog.getSaveFileName",
+        "spwb.gui.settings.QFileDialog.getSaveFileName",
         lambda *a, **k: (str(tmp_path / "run.h5"), ""))
     window.save_hdf5()
     written = tmp_path / "run.h5"
@@ -63,7 +63,7 @@ def test_save_and_reload_through_the_window(window, monkeypatch, tmp_path):
 
     other = TimeProcessingWindow(window.manager)
     monkeypatch.setattr(
-        "spwb.gui.time_processing.QFileDialog.getOpenFileName",
+        "spwb.gui.settings.QFileDialog.getOpenFileName",
         lambda *a, **k: (str(written), ""))
     other.open_hdf5()
     (back,) = list(other.store)
@@ -79,7 +79,7 @@ def test_only_visible_signals_are_saved(window, monkeypatch, tmp_path):
     window.store.add(sine("hidden"))
     window.tree.topLevelItem(1).setCheckState(0, Qt.Unchecked)
     monkeypatch.setattr(
-        "spwb.gui.time_processing.QFileDialog.getSaveFileName",
+        "spwb.gui.settings.QFileDialog.getSaveFileName",
         lambda *a, **k: (str(tmp_path / "v.h5"), ""))
     window.save_hdf5()
     assert [s.name for s in read_hdf5(tmp_path / "v.h5")] == ["keep"]
@@ -99,7 +99,7 @@ def test_a_broken_file_is_reported_not_crashed(window, monkeypatch, tmp_path):
     bad.write_bytes(b"this is not an HDF5 file at all")
     shown = {}
     monkeypatch.setattr(
-        "spwb.gui.time_processing.QFileDialog.getOpenFileName",
+        "spwb.gui.settings.QFileDialog.getOpenFileName",
         lambda *a, **k: (str(bad), ""))
     monkeypatch.setattr(
         "spwb.gui.time_processing.QMessageBox.critical",
@@ -112,7 +112,7 @@ def test_a_broken_file_is_reported_not_crashed(window, monkeypatch, tmp_path):
 def test_a_second_import_decorates_names(window, monkeypatch, tmp_path):
     path = write_hdf5(tmp_path / "src.h5", [sine("mic")])
     monkeypatch.setattr(
-        "spwb.gui.time_processing.QFileDialog.getOpenFileName",
+        "spwb.gui.settings.QFileDialog.getOpenFileName",
         lambda *a, **k: (str(path), ""))
     window.open_hdf5()
     window.open_hdf5()
@@ -140,7 +140,7 @@ def test_an_analysis_result_survives_the_window_round_trip(window,
     window.store.add(auto_power_spectrums(sine(amp=3.0), freq_resolution=2.0,
                                           window="flat_top"))
     monkeypatch.setattr(
-        "spwb.gui.time_processing.QFileDialog.getSaveFileName",
+        "spwb.gui.settings.QFileDialog.getSaveFileName",
         lambda *a, **k: (str(tmp_path / "spec.h5"), ""))
     window.save_hdf5()
     (back,) = read_hdf5(tmp_path / "spec.h5")
