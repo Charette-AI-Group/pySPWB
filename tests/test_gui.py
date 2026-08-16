@@ -222,3 +222,35 @@ def test_window_save_and_reload_via_tdms(window, manager, tmp_path):
     assert [s.name for s in other.store] == ["accel"]
     assert next(iter(other.store)).y_unit == "m/s^2"
     other.close()
+
+
+def test_the_signal_list_and_attributes_box_are_user_adjustable(qapp):
+    """Both splits in the Time Processing window must be draggable.
+
+    The attributes box used to be capped at a fixed 150 px, so the only
+    adjustable split was left/right. Which of the two panes needs the room
+    changes with the session - many signals, or one signal with a lot of
+    attributes - so it belongs to the user.
+    """
+    from PySide6.QtWidgets import QSplitter
+
+    window = TimeProcessingWindow(WindowManager())
+    try:
+        outer = window.centralWidget()
+        left = outer.widget(0)
+
+        assert isinstance(outer, QSplitter)
+        assert isinstance(left, QSplitter), "the left panel is not a splitter"
+        assert left.orientation() == Qt.Vertical
+        assert left.count() == 2
+
+        # no fixed cap, or the splitter could not grow it
+        assert window.details.maximumHeight() > 1000
+
+        left.setSizes([120, 480])
+        assert left.sizes()[1] > left.sizes()[0]
+
+        left.setSizes([600, 0])          # dragging it shut hides attributes
+        assert left.sizes()[1] == 0
+    finally:
+        window.close()

@@ -97,17 +97,33 @@ class TimeProcessingWindow(QMainWindow):
 
         self.details = QPlainTextEdit()
         self.details.setReadOnly(True)
-        self.details.setMaximumHeight(150)
         self.details.setPlaceholderText("Select a signal to see its attributes")
 
-        left = QWidget()
-        left_layout = QVBoxLayout(left)
-        left_layout.setContentsMargins(6, 6, 6, 6)
-        left_layout.addWidget(QLabel("Signals in this window"))
-        left_layout.addWidget(self.tree, 1)
-        left_layout.addLayout(buttons)
-        left_layout.addWidget(QLabel("Attributes"))
-        left_layout.addWidget(self.details)
+        # The signal list and the attributes box get a splitter of their own.
+        # A demo file's attributes can run to a dozen lines, and a session can
+        # hold a dozen signals, so which of the two needs the room changes
+        # from minute to minute - that is the splitter's job, not a fixed
+        # height's. Dragging it fully shut hides the attributes entirely.
+        list_panel = QWidget()
+        list_layout = QVBoxLayout(list_panel)
+        list_layout.setContentsMargins(0, 0, 0, 0)
+        list_layout.addWidget(QLabel("Signals in this window"))
+        list_layout.addWidget(self.tree, 1)
+        list_layout.addLayout(buttons)
+
+        details_panel = QWidget()
+        details_layout = QVBoxLayout(details_panel)
+        details_layout.setContentsMargins(0, 6, 0, 0)
+        details_layout.addWidget(QLabel("Attributes"))
+        details_layout.addWidget(self.details, 1)
+
+        left = QSplitter(Qt.Vertical)
+        left.setContentsMargins(6, 6, 6, 6)
+        left.addWidget(list_panel)
+        left.addWidget(details_panel)
+        left.setStretchFactor(0, 1)     # the list takes new space
+        left.setStretchFactor(1, 0)
+        left.setSizes([440, 170])       # about the old fixed proportions
 
         self.plot = SpwbPlot()
         self.plot.setLabel("bottom", "Time", units="s")
