@@ -18,7 +18,6 @@ from PySide6.QtCore import Qt
 from PySide6.QtGui import QAction, QKeySequence
 from PySide6.QtWidgets import (
     QAbstractItemView,
-    QHBoxLayout,
     QHeaderView,
     QInputDialog,
     QLabel,
@@ -40,6 +39,7 @@ from . import settings
 from .analysis_tabs import ScaleSignalsTab, StatsTab, TVMetricsTab
 from .bridge import StoreBridge, WindowManager
 from .dialogs import ChannelSelectDialog, CreateSignalDialog, ImportFromWindowDialog
+from .flow_layout import FlowLayout
 from .plotting import SpwbPlot, curve_pen
 
 __all__ = ["TimeProcessingWindow"]
@@ -110,10 +110,11 @@ class TimeProcessingWindow(QMainWindow):
         delete_btn.clicked.connect(self.delete_selected)
         hide_btn = QPushButton("Delete All Invisible Signals")
         hide_btn.clicked.connect(self.delete_invisible)
-        buttons = QHBoxLayout()
+        # these two together are 550 px, which used to be the left panel's
+        # minimum width; wrapping lets the panel be dragged much narrower
+        buttons = FlowLayout()
         buttons.addWidget(delete_btn)
         buttons.addWidget(hide_btn)
-        buttons.addStretch(1)
 
         self.details = QPlainTextEdit()
         self.details.setReadOnly(True)

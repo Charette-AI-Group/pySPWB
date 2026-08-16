@@ -114,6 +114,7 @@ ridge = spec.freqs[spec.data.argmax(axis=1)]  # dominant frequency vs time
 | `gui` — Text/CSV open and save in the Time Processing window | ✅ runs |
 | `gui.plotting` — LabVIEW-style graph palette on every plot: pan, rect / X / Y zoom, fit, undo | ✅ runs |
 | `gui.settings` — remembers browse folders per file type and operation, plus window geometry, splitters and column layout | ✅ runs |
+| `gui.flow_layout` — wrapping control rows, so the window fits a laptop screen | ✅ runs |
 
 ## Numerical fidelity
 
@@ -477,6 +478,24 @@ All five analysis windows share `SpwbPlot`, which also absorbed the plot
 theming that used to be copy-pasted into each of them. It forwards unknown
 attributes to the `PlotWidget` it wraps, so `plot.plot(...)`,
 `plot.setLabel(...)` and the rest are unchanged.
+
+### Fitting on a real screen
+
+A `QHBoxLayout`'s minimum width is the **sum** of its children, and a
+child's minimum propagates all the way up. Two habits had compounded into a
+Time Processing window that refused to be narrower than **2052 px** — wider
+than a 1920 display, so it could not be sized to fit one:
+
+* `QLabel` does not word-wrap by default, so a one-sentence help line's
+  minimum width is the whole sentence. Two of them accounted for ~250 px.
+* rows of controls laid out end to end set the floor at their total width.
+
+Help text now wraps, and control rows use `gui/flow_layout.py` — the
+`QLayout` subclass Qt's own examples describe, whose `minimumSize` returns
+the **widest single child** rather than the sum. Below that width the row
+wraps onto another line instead of pushing the window wider.
+
+Minimum width: **2052 → 838 px**.
 
 ### Remembered folders
 

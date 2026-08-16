@@ -305,3 +305,37 @@ def test_the_window_fits_on_a_1920_pixel_screen(qapp):
         assert window.minimumSizeHint().width() < 1920
     finally:
         window.close()
+
+
+def test_control_rows_wrap_instead_of_setting_the_window_width(qapp):
+    """A QHBoxLayout's minimum is the sum of its children; a flow layout's
+    is the widest single child. That is what lets the window be narrowed."""
+    from spwb.gui.analysis_tabs import ScaleSignalsTab, TVMetricsTab
+    from spwb.gui.flow_layout import FlowLayout
+    from spwb.processing.model.store import SignalStore
+
+    for cls in (ScaleSignalsTab, TVMetricsTab):
+        tab = cls(SignalStore())
+        flows = [layout for layout in tab.findChildren(FlowLayout)]
+        assert flows, f"{cls.__name__} still uses a fixed-width control row"
+        for flow in flows:
+            widest = max(flow.itemAt(i).minimumSize().width()
+                         for i in range(flow.count()))
+            total = sum(flow.itemAt(i).sizeHint().width()
+                        for i in range(flow.count()))
+            assert flow.minimumSize().width() <= widest + 1
+            assert flow.minimumSize().width() < total
+
+
+def test_the_window_fits_a_1280_pixel_screen(qapp):
+    """The whole point of the exercise: usable on a laptop, not just a
+    workstation. It was 2052 px before the labels wrapped and the control
+    rows flowed."""
+    from spwb.gui.bridge import WindowManager
+    from spwb.gui.time_processing import TimeProcessingWindow
+
+    window = TimeProcessingWindow(WindowManager())
+    try:
+        assert window.minimumSizeHint().width() <= 1280
+    finally:
+        window.close()

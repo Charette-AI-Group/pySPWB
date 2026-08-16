@@ -31,6 +31,7 @@ from ..processing.dsp import conditioning as C
 from ..processing.dsp import metrics as M
 from ..processing.model.signal import Signal
 from ..processing.model.store import SignalStore
+from .flow_layout import FlowLayout
 
 __all__ = ["ScaleSignalsTab", "StatsTab", "TVMetricsTab"]
 
@@ -114,14 +115,14 @@ class ScaleSignalsTab(_StoreTab):
         normalize_btn = QPushButton("Normalize ALL Signals")
         normalize_btn.clicked.connect(self.normalize)
 
-        row = QHBoxLayout()
+        # a flow layout, not a QHBoxLayout: this row is ~1250 px laid end
+        # to end, and an hbox would make that the window's minimum width
+        row = FlowLayout()
         row.addWidget(apply_btn)
         row.addWidget(reset_btn)
-        row.addSpacing(24)
         row.addWidget(QLabel("Normalization:"))
         row.addWidget(self.normalize_box)
         row.addWidget(normalize_btn)
-        row.addStretch(1)
 
         layout = QVBoxLayout(self)
         layout.addWidget(_help(
@@ -287,7 +288,7 @@ class TVMetricsTab(_StoreTab):
         self.summary.horizontalHeader().setSectionResizeMode(
             0, QHeaderView.Stretch)
 
-        row = QHBoxLayout()
+        row = FlowLayout()
         row.addWidget(QLabel("Type:"))
         row.addWidget(self.trend)
         row.addWidget(QLabel("Step:"))
@@ -295,7 +296,6 @@ class TVMetricsTab(_StoreTab):
         row.addWidget(QLabel("Length:"))
         row.addWidget(self.length)
         row.addWidget(compute)
-        row.addStretch(1)
 
         layout = QVBoxLayout(self)
         layout.addLayout(row)

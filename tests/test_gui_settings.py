@@ -308,11 +308,17 @@ def test_window_size_and_splitters_survive_a_restart(store, qapp):
     pytest.importorskip("pyqtgraph")
     from PySide6.QtWidgets import QSplitter
 
+    # stay inside the available screen: restoreGeometry deliberately keeps
+    # a window on screen, so a saved size larger than the display comes back
+    # clamped - correct behaviour, but it would make this assertion lie
+    available = qapp.primaryScreen().availableGeometry()
+
     first = _window()
     first.show()
     qapp.processEvents()
     try:
-        first.resize(first.width(), 512)
+        first.resize(min(first.width(), available.width() - 40),
+                     min(512, available.height() - 40))
         for splitter in first.findChildren(QSplitter):
             if splitter.objectName():
                 splitter.setSizes([300, 200])
