@@ -272,3 +272,36 @@ def test_only_visible_signals_are_trended(burst_window):
     trends = [s for s in burst_window.store
               if "TVM_Trend_Type" in s.attributes]
     assert [t.name for t in trends] == ["burst (TVM)"]
+
+
+def test_help_labels_wrap_so_the_window_can_be_narrowed(qapp):
+    """A QLabel does not wrap by default, and its minimum propagates up.
+
+    These two sentences alone forced the Time Processing window to a
+    minimum width of 2052 px - wider than a 1920-pixel screen, so it could
+    not be sized to fit one.
+    """
+    from PySide6.QtWidgets import QLabel
+
+    from spwb.gui.analysis_tabs import ScaleSignalsTab, TVMetricsTab
+    from spwb.processing.model.store import SignalStore
+
+    for cls in (ScaleSignalsTab, TVMetricsTab):
+        tab = cls(SignalStore())
+        long_labels = [lb for lb in tab.findChildren(QLabel)
+                       if len(lb.text()) > 40]
+        assert long_labels, f"{cls.__name__} has no help label to check"
+        for label in long_labels:
+            assert label.wordWrap(), (
+                f"{cls.__name__}: {label.text()[:40]!r} does not wrap")
+
+
+def test_the_window_fits_on_a_1920_pixel_screen(qapp):
+    from spwb.gui.bridge import WindowManager
+    from spwb.gui.time_processing import TimeProcessingWindow
+
+    window = TimeProcessingWindow(WindowManager())
+    try:
+        assert window.minimumSizeHint().width() < 1920
+    finally:
+        window.close()

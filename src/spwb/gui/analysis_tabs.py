@@ -35,6 +35,20 @@ from ..processing.model.store import SignalStore
 __all__ = ["ScaleSignalsTab", "StatsTab", "TVMetricsTab"]
 
 
+def _help(text: str) -> QLabel:
+    """An explanatory line above a tab's controls.
+
+    Word wrap matters more than it looks: a ``QLabel`` does not wrap by
+    default, so its minimum width is the whole sentence on one line - and a
+    widget's minimum propagates all the way up. These two sentences alone
+    were forcing the Time Processing window to a minimum of 2052 px, wider
+    than a 1920-pixel screen, so it could not be sized to fit.
+    """
+    label = QLabel(text)
+    label.setWordWrap(True)
+    return label
+
+
 def _copy_table(table: QTableWidget, headers: list[str]) -> str:
     lines = ["\t".join(headers)]
     for row in range(table.rowCount()):
@@ -110,7 +124,7 @@ class ScaleSignalsTab(_StoreTab):
         row.addStretch(1)
 
         layout = QVBoxLayout(self)
-        layout.addWidget(QLabel(
+        layout.addWidget(_help(
             "Edit a row, then Apply. Factor scales the raw signal; the "
             "offset is added afterwards, in the calibrated unit."))
         layout.addWidget(self.table, 1)
@@ -285,7 +299,7 @@ class TVMetricsTab(_StoreTab):
 
         layout = QVBoxLayout(self)
         layout.addLayout(row)
-        layout.addWidget(QLabel(
+        layout.addWidget(_help(
             "Each trend is added to the window as a new signal, so it plots "
             "with the data and can be exported or sent to another window."))
         layout.addWidget(self.summary, 1)
