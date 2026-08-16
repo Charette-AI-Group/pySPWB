@@ -290,3 +290,22 @@ def test_column_widths_survive_a_list_rebuild(qapp):
         assert window.tree.columnWidth(0) == 337
     finally:
         window.close()
+
+
+def test_all_five_columns_fit_the_default_panel(qapp):
+    """Fixed widths came to 555 px in a 404 px viewport, so Duration and
+    Unit sat behind a scrollbar on a fresh install. The numeric columns are
+    sized from their own header text now, which follows font and DPI."""
+    window = TimeProcessingWindow(WindowManager())
+    try:
+        window.resize(1150, 720)
+        window.ensurePolished()
+        qapp.processEvents()
+        window.grab()                     # force a real layout pass
+
+        total = sum(window.tree.columnWidth(c)
+                    for c in range(window.tree.columnCount()))
+        assert total <= window.tree.viewport().width(), (
+            f"{total - window.tree.viewport().width()}px of columns hidden")
+    finally:
+        window.close()

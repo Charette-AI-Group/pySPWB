@@ -44,10 +44,12 @@ from .plotting import SpwbPlot, curve_pen
 
 __all__ = ["TimeProcessingWindow"]
 
-#: starting widths for the signal table, in the header's own order. The name
-#: gets the room because it is the column that actually varies in length -
-#: "Sine 1 Vpk + 3 V offset" should be readable without dragging anything.
-_COLUMN_WIDTHS = (240, 80, 80, 95, 60)
+#: sort/checkbox room plus a little air either side of a header label
+_HEADER_PADDING = 26
+#: the name column never starts narrower than this, even in a cramped panel
+_MIN_NAME_WIDTH = 150
+#: the left panel's own default, so the five columns start out fitting it
+_DEFAULT_PANEL_WIDTH = 440
 
 #: settings key for the signal table's remembered layout
 _SIGNAL_TABLE = "signal_table"
@@ -101,8 +103,7 @@ class TimeProcessingWindow(QMainWindow):
         header.setSectionResizeMode(QHeaderView.Interactive)
         header.setStretchLastSection(False)
         header.setSectionsMovable(True)
-        for col, width in enumerate(_COLUMN_WIDTHS):
-            self.tree.setColumnWidth(col, width)
+        self._set_default_columns()
         # a layout saved by a previous session replaces those defaults
         settings.restore_header(_SIGNAL_TABLE, header)
 
@@ -175,9 +176,32 @@ class TimeProcessingWindow(QMainWindow):
         splitter.addWidget(right)
         splitter.setStretchFactor(0, 0)
         splitter.setStretchFactor(1, 1)
-        splitter.setSizes([420, 680])
+        # 470, not 420: the five columns come to ~417 px, and a panel
+        # narrower than that hides Duration and Unit behind a scrollbar
+        # on a fresh install
+        splitter.setSizes([470, 680])
         self.setCentralWidget(splitter)
         self.statusBar().showMessage("Ready")
+
+    def _set_default_columns(self) -> None:
+        """Widths that fit the panel, before the user takes them over.
+
+        Hard-coded widths were wrong: they came to 555 px in a 404 px
+        viewport, so Duration and Unit sat behind a scrollbar on a fresh
+        install. The four numeric columns are sized to their own header
+        text instead - which is what they actually need, and follows the
+        font and DPI rather than assuming mine - and the name column takes
+        whatever is left of the panel.
+        """
+        metrics = self.tree.fontMetrics()
+        item = self.tree.headerItem()
+        numeric = 0
+        for col in range(1, self.tree.columnCount()):
+            width = metrics.horizontalAdvance(item.text(col)) + _HEADER_PADDING
+            self.tree.setColumnWidth(col, width)
+            numeric += width
+        self.tree.setColumnWidth(
+            0, max(_MIN_NAME_WIDTH, _DEFAULT_PANEL_WIDTH - numeric))
 
     def _refresh_tabs(self) -> None:
         """Rebuild only the visible tab: the others rebuild when shown."""

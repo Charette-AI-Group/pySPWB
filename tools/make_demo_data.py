@@ -30,8 +30,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from spwb.processing.io import write_hdf5
 from spwb.processing.model.signal import Signal
 
-DEFAULT_OUT = Path(r"D:\data\dataSets\2014 & prior - devData\devData"
-                   r"\DSP Benchmark Signals\SPWB")
+# The repo's own untracked working folder, found relative to this script so
+# it follows the checkout. Git ignores .data entirely: everything in it is
+# generated from here, so a clean clone simply re-creates it.
+DEFAULT_OUT = Path(__file__).resolve().parents[1] / ".data"
 
 FS = 8192.0          # 1 Hz bins with a 8192-point block
 FS_AUDIO = 51200.0   # SPWB's default rate, needed to reach 16 kHz

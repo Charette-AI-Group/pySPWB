@@ -19,8 +19,7 @@ from spwb.processing.dsp import (
 )
 from spwb.processing.io import read_hdf5
 
-D = pathlib.Path(r"D:\data\dataSets\2014 & prior - devData\devData"
-                 r"\DSP Benchmark Signals\SPWB")
+D = pathlib.Path(__file__).resolve().parents[1] / ".data"
 ok = fail = 0
 
 
