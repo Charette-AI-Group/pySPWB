@@ -48,6 +48,8 @@ __all__ = ["TimeProcessingWindow"]
 _HEADER_PADDING = 26
 #: the name column never starts narrower than this, even in a cramped panel
 _MIN_NAME_WIDTH = 150
+#: floor for the numeric columns when they have to be scaled down
+_MIN_COLUMN_WIDTH = 44
 #: the left panel's own default, so the five columns start out fitting it
 _DEFAULT_PANEL_WIDTH = 440
 
@@ -189,19 +191,28 @@ class TimeProcessingWindow(QMainWindow):
         Hard-coded widths were wrong: they came to 555 px in a 404 px
         viewport, so Duration and Unit sat behind a scrollbar on a fresh
         install. The four numeric columns are sized to their own header
-        text instead - which is what they actually need, and follows the
-        font and DPI rather than assuming mine - and the name column takes
-        whatever is left of the panel.
+        text instead, which follows the font and DPI rather than assuming
+        one machine's, and the name column takes what is left.
+
+        The whole set is then made to fit the budget, not just the name:
+        with a wide fallback font the four numeric headers alone can
+        overflow, and squeezing only the name column would still leave a
+        scrollbar. They are scaled down together in that case.
         """
         metrics = self.tree.fontMetrics()
         item = self.tree.headerItem()
-        numeric = 0
-        for col in range(1, self.tree.columnCount()):
-            width = metrics.horizontalAdvance(item.text(col)) + _HEADER_PADDING
+        widths = [metrics.horizontalAdvance(item.text(col)) + _HEADER_PADDING
+                  for col in range(1, self.tree.columnCount())]
+
+        spare = _DEFAULT_PANEL_WIDTH - _MIN_NAME_WIDTH
+        if sum(widths) > spare:
+            scale = spare / sum(widths)
+            widths = [max(_MIN_COLUMN_WIDTH, int(w * scale)) for w in widths]
+
+        for col, width in enumerate(widths, start=1):
             self.tree.setColumnWidth(col, width)
-            numeric += width
         self.tree.setColumnWidth(
-            0, max(_MIN_NAME_WIDTH, _DEFAULT_PANEL_WIDTH - numeric))
+            0, max(_MIN_NAME_WIDTH, _DEFAULT_PANEL_WIDTH - sum(widths)))
 
     def _refresh_tabs(self) -> None:
         """Rebuild only the visible tab: the others rebuild when shown."""
