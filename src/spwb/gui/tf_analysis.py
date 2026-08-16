@@ -39,6 +39,7 @@ from ..processing.dsp import transfer as T
 from ..processing.dsp.windows import WINDOW_NAMES
 from ..processing.model.signal import Signal
 from ..processing.model.store import SignalStore
+from . import settings
 from .bridge import StoreBridge, WindowManager
 from .dialogs import ImportFromWindowDialog
 from .fft_analysis import _WINDOW_LABELS
@@ -64,6 +65,8 @@ class TransferFunctionWindow(QMainWindow):
 
         self._build_ui()
         self._build_menus()
+        # a layout saved by a previous session replaces the defaults
+        settings.restore_window(self.window_name, self)
 
         self.bridge.changed.connect(self._on_store_changed)
         self.manager.windows_changed.connect(self._update_import_action)
@@ -126,12 +129,14 @@ class TransferFunctionWindow(QMainWindow):
         self.legend = self.plot.addLegend(offset=(-10, 10))
 
         right = QSplitter(Qt.Vertical)
+        right.setObjectName("right")
         right.addWidget(self.plot)
         right.addWidget(self._build_tabs())
         right.setStretchFactor(0, 1)
         right.setSizes([500, 230])
 
         splitter = QSplitter(Qt.Horizontal)
+        splitter.setObjectName("main")
         splitter.addWidget(left)
         splitter.addWidget(right)
         splitter.setStretchFactor(1, 1)
@@ -441,6 +446,7 @@ class TransferFunctionWindow(QMainWindow):
                 self.store.remove(sig.sid)
 
     def closeEvent(self, event) -> None:
+        settings.save_window(self.window_name, self)
         self.manager.unregister(self)
         self.bridge.close()
         super().closeEvent(event)

@@ -30,6 +30,7 @@ from PySide6.QtWidgets import (
 
 from ..processing.dsp import adaptive as A
 from ..processing.model.store import SignalStore
+from . import settings
 from .bridge import StoreBridge, WindowManager
 from .dialogs import ImportFromWindowDialog
 from .plotting import SpwbPlot, curve_pen
@@ -51,6 +52,8 @@ class LMSWindow(QMainWindow):
 
         self._build_ui()
         self._build_menus()
+        # a layout saved by a previous session replaces the defaults
+        settings.restore_window(self.window_name, self)
         self.bridge.changed.connect(self._refresh_selectors)
         self.manager.windows_changed.connect(self._update_import_action)
         self._refresh_selectors()
@@ -77,12 +80,14 @@ class LMSWindow(QMainWindow):
         self.coefficient_plot = self._plot("Tap", "Weight")
 
         lower = QSplitter(Qt.Horizontal)
+        lower.setObjectName("lower")
         lower.addWidget(self._titled("Convergence (residual vs reference)",
                                      self.convergence_plot))
         lower.addWidget(self._titled("Learned filter", self.coefficient_plot))
         lower.setSizes([520, 520])
 
         plots = QSplitter(Qt.Vertical)
+        plots.setObjectName("plots")
         plots.addWidget(self._titled("Signals", self.signal_plot))
         plots.addWidget(lower)
         plots.setStretchFactor(0, 2)
@@ -343,6 +348,7 @@ class LMSWindow(QMainWindow):
                 self.store.add(sig)
 
     def closeEvent(self, event) -> None:
+        settings.save_window(self.window_name, self)
         self.manager.unregister(self)
         self.bridge.close()
         super().closeEvent(event)

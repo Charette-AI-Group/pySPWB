@@ -34,9 +34,15 @@ import os
 from pathlib import Path
 
 from PySide6.QtCore import QSettings
-from PySide6.QtWidgets import QFileDialog, QHeaderView, QWidget
+from PySide6.QtWidgets import (
+    QFileDialog,
+    QHeaderView,
+    QSplitter,
+    QWidget,
+)
 
 __all__ = [
+    "CASCADE_STEP",
     "KINDS",
     "MODES",
     "forget_dirs",
@@ -45,9 +51,15 @@ __all__ = [
     "open_file",
     "open_files",
     "remember_dir",
+    "restore_geometry",
     "restore_header",
+    "restore_splitter",
+    "restore_window",
     "save_file",
+    "save_geometry",
     "save_header",
+    "save_splitter",
+    "save_window",
 ]
 
 #: file-type slugs, one remembered folder per (kind, mode) pair. Slugs are
@@ -145,8 +157,84 @@ def restore_header(name: str, header: QHeaderView) -> bool:
     return bool(header.restoreState(state))
 
 
+def save_splitter(name: str, splitter: QSplitter) -> None:
+    """Remember where a splitter's handles sit."""
+    store = _store()
+    store.setValue(f"{_LAYOUT}/{name}/state", splitter.saveState())
+    store.setValue(f"{_LAYOUT}/{name}/version", HEADER_VERSION)
+
+
+def restore_splitter(name: str, splitter: QSplitter) -> bool:
+    """Put a splitter's handles back. Returns whether a layout was used."""
+    store = _store()
+    if store.value(f"{_LAYOUT}/{name}/version", 0, type=int) != HEADER_VERSION:
+        return False
+    state = store.value(f"{_LAYOUT}/{name}/state")
+    if not state:
+        return False
+    return bool(splitter.restoreState(state))
+
+
+def save_geometry(name: str, widget: QWidget) -> None:
+    """Remember a window's size and position."""
+    _store().setValue(f"{_LAYOUT}/{name}/geometry", widget.saveGeometry())
+
+
+def restore_geometry(name: str, widget: QWidget) -> bool:
+    """Put a window back where it was. Returns whether it was moved.
+
+    ``restoreGeometry`` is the right call rather than ``move``/``resize``:
+    Qt checks the saved position against the screens that exist *now*, so a
+    window last used on a monitor that is no longer attached comes back on
+    screen instead of somewhere invisible.
+    """
+    state = _store().value(f"{_LAYOUT}/{name}/geometry")
+    return bool(state) and bool(widget.restoreGeometry(state))
+
+
+#: how far each extra window of the same type is nudged, so a second one
+#: does not land exactly on top of the first
+CASCADE_STEP = 30
+_CASCADE_WRAP = 6
+
+
+def save_window(window_name: str, window: QWidget) -> None:
+    """Remember a window's geometry and every named splitter inside it.
+
+    ``window_name`` is the manager's name (``"TDP 01"``); the layout is
+    keyed on the type prefix, so all Time Processing windows share one
+    remembered layout rather than fighting over separate ones.
+    """
+    prefix = window_name.split()[0]
+    save_geometry(prefix, window)
+    for splitter in window.findChildren(QSplitter):
+        if splitter.objectName():
+            save_splitter(f"{prefix}/{splitter.objectName()}", splitter)
+
+
+def restore_window(window_name: str, window: QWidget) -> bool:
+    """Re-apply a saved window layout, cascading extra instances.
+
+    Only splitters with an ``objectName`` take part - the name is the
+    storage key, so an unnamed splitter is deliberately not persisted.
+    """
+    prefix, _, index = window_name.partition(" ")
+    restored = restore_geometry(prefix, window)
+    try:
+        step = int(index) % _CASCADE_WRAP
+    except ValueError:
+        step = 0
+    if restored and step:
+        offset = step * CASCADE_STEP
+        window.move(window.x() + offset, window.y() + offset)
+    for splitter in window.findChildren(QSplitter):
+        if splitter.objectName():
+            restore_splitter(f"{prefix}/{splitter.objectName()}", splitter)
+    return restored
+
+
 def forget_layout() -> None:
-    """Drop every saved table layout, so the defaults come back."""
+    """Drop every saved layout - tables, splitters and window geometry."""
     store = _store()
     store.remove(_LAYOUT)
     store.sync()

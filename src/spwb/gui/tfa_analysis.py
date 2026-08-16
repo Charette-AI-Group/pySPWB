@@ -31,6 +31,7 @@ from ..processing.dsp import timefreq as TF
 from ..processing.dsp.windows import WINDOW_NAMES
 from ..processing.model.signal import Signal
 from ..processing.model.store import SignalStore
+from . import settings
 from .bridge import StoreBridge, WindowManager
 from .dialogs import ImportFromWindowDialog
 from .fft_analysis import _WINDOW_LABELS
@@ -63,6 +64,8 @@ class TimeFrequencyWindow(QMainWindow):
 
         self._build_ui()
         self._build_menus()
+        # a layout saved by a previous session replaces the defaults
+        settings.restore_window(self.window_name, self)
 
         self.bridge.changed.connect(self._on_store_changed)
         self.manager.windows_changed.connect(self._update_import_action)
@@ -110,6 +113,7 @@ class TimeFrequencyWindow(QMainWindow):
             pen=curve_pen("#d62728"))
 
         sections = QSplitter(Qt.Horizontal)
+        sections.setObjectName("sections")
         sections.addWidget(self._titled("Time Section (spectrum at cursor)",
                                         self.time_section_plot))
         sections.addWidget(self._titled("Frequency Section (level over time)",
@@ -117,6 +121,7 @@ class TimeFrequencyWindow(QMainWindow):
         sections.setSizes([500, 500])
 
         centre = QSplitter(Qt.Vertical)
+        centre.setObjectName("centre")
         centre.addWidget(self._titled("Spectrogram", self.image_plot))
         centre.addWidget(sections)
         centre.setStretchFactor(0, 2)
@@ -384,6 +389,7 @@ class TimeFrequencyWindow(QMainWindow):
         self.statusBar().showMessage("Both sections copied to clipboard")
 
     def closeEvent(self, event) -> None:
+        settings.save_window(self.window_name, self)
         self.manager.unregister(self)
         self.bridge.close()
         super().closeEvent(event)

@@ -113,7 +113,7 @@ ridge = spec.freqs[spec.data.argmax(axis=1)]  # dominant frequency vs time
 | `processing.io.text` — text/CSV read **and** write, Excel-facing schema, locale separators, text FRF reader | ✅ round-trips exactly |
 | `gui` — Text/CSV open and save in the Time Processing window | ✅ runs |
 | `gui.plotting` — LabVIEW-style graph palette on every plot: pan, rect / X / Y zoom, fit, undo | ✅ runs |
-| `gui.settings` — remembers the last browse folder per file type and operation, and the signal table's column layout | ✅ runs |
+| `gui.settings` — remembers browse folders per file type and operation, plus window geometry, splitters and column layout | ✅ runs |
 
 ## Numerical fidelity
 
@@ -499,10 +499,18 @@ All eleven dialogs go through `settings.open_file` / `open_files` /
 the remembered folder without also recording the new one. `forget_dirs()`
 clears the lot.
 
-The signal table's **column widths and order** are remembered the same way,
-in Qt's own header state blob, restored on open and saved on close. A
-`HEADER_VERSION` guard discards a layout saved before the columns changed,
-rather than restoring old widths onto columns that have since moved.
+The **whole layout** is remembered the same way: window size and position,
+every splitter, and the signal table's column widths and order — all in
+Qt's own state blobs, restored when a window opens and saved when it
+closes. A `HEADER_VERSION` guard discards a layout saved before the
+columns or panes changed, rather than restoring stale sizes onto a
+different arrangement. `forget_layout()` clears the lot.
+
+Layouts are keyed on the window *type*, so every Time Processing window
+shares one — and a second instance is cascaded by `CASCADE_STEP` so it does
+not land exactly on top of the first. Only splitters with an `objectName`
+take part: the name is the storage key, which keeps the mapping stable when
+the widget tree changes.
 
 ### Architecture
 

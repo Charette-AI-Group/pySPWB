@@ -301,3 +301,100 @@ def test_restore_header_reports_whether_it_did_anything(store, qapp):
 
     settings.save_header("saved", tree.header())
     assert settings.restore_header("saved", tree.header()) is True
+
+
+# -- window geometry and splitters -----------------------------------------
+def test_window_size_and_splitters_survive_a_restart(store, qapp):
+    pytest.importorskip("pyqtgraph")
+    from PySide6.QtWidgets import QSplitter
+
+    first = _window()
+    first.show()
+    qapp.processEvents()
+    try:
+        first.resize(first.width(), 512)
+        for splitter in first.findChildren(QSplitter):
+            if splitter.objectName():
+                splitter.setSizes([300, 200])
+        qapp.processEvents()
+        # whatever the layout settled on is the contract, since a window
+        # cannot go below its own minimumSizeHint
+        expected_size = first.size()
+        expected = {s.objectName(): s.sizes()
+                    for s in first.findChildren(QSplitter) if s.objectName()}
+    finally:
+        first.close()
+
+    second = _window()
+    second.show()
+    qapp.processEvents()
+    try:
+        assert second.size() == expected_size
+        got = {s.objectName(): s.sizes()
+               for s in second.findChildren(QSplitter) if s.objectName()}
+        assert got == expected
+    finally:
+        second.close()
+
+
+def test_a_second_window_of_the_same_type_is_offset(store, qapp):
+    """Otherwise every window restores exactly on top of the last."""
+    pytest.importorskip("pyqtgraph")
+    from spwb.gui.bridge import WindowManager
+    from spwb.gui.time_processing import TimeProcessingWindow
+
+    first = _window()
+    first.show()
+    qapp.processEvents()
+    first.close()                       # so there is a geometry to restore
+
+    manager = WindowManager()
+    a = TimeProcessingWindow(manager)
+    b = TimeProcessingWindow(manager)
+    a.show()
+    b.show()
+    qapp.processEvents()
+    try:
+        assert (b.x(), b.y()) != (a.x(), a.y())
+    finally:
+        a.close()
+        b.close()
+
+
+def test_only_named_splitters_are_persisted(store, qapp):
+    """The objectName is the storage key, so an unnamed one cannot be saved."""
+    from PySide6.QtWidgets import QLabel, QMainWindow, QSplitter
+
+    window = QMainWindow()
+    named = QSplitter()
+    named.setObjectName("kept")
+    named.addWidget(QLabel("a"))
+    named.addWidget(QLabel("b"))
+    anonymous = QSplitter()
+    anonymous.addWidget(QLabel("c"))
+    anonymous.addWidget(QLabel("d"))
+    holder = QSplitter()
+    holder.setObjectName("holder")
+    holder.addWidget(named)
+    holder.addWidget(anonymous)
+    window.setCentralWidget(holder)
+
+    settings.save_window("XYZ 00", window)
+
+    keys = [k for k in store.allKeys() if k.startswith("layout/XYZ/")]
+    assert any("kept" in k for k in keys)
+    assert not any("anonymous" in k for k in keys)
+
+
+def test_forget_layout_also_clears_window_geometry(store, qapp):
+    pytest.importorskip("pyqtgraph")
+
+    first = _window()
+    first.show()
+    qapp.processEvents()
+    first.close()
+    assert [k for k in store.allKeys() if "geometry" in k]
+
+    settings.forget_layout()
+
+    assert not [k for k in store.allKeys() if k.startswith("layout/")]

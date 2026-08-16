@@ -39,6 +39,7 @@ from ..processing.dsp import spectral as S
 from ..processing.dsp.windows import WINDOW_NAMES
 from ..processing.model.signal import Signal
 from ..processing.model.store import SignalStore
+from . import settings
 from .bridge import StoreBridge, WindowManager
 from .dialogs import ImportFromWindowDialog
 from .plotting import PEN_COLOURS, SpwbPlot, curve_pen
@@ -77,6 +78,8 @@ class FFTWindow(QMainWindow):
 
         self._build_ui()
         self._build_menus()
+        # a layout saved by a previous session replaces the defaults
+        settings.restore_window(self.window_name, self)
 
         self.bridge.changed.connect(self.recompute)
         self.manager.windows_changed.connect(self._update_import_action)
@@ -122,6 +125,7 @@ class FFTWindow(QMainWindow):
         self.legend = self.plot.addLegend(offset=(-10, 10))
 
         right = QSplitter(Qt.Vertical)
+        right.setObjectName("right")
         right.addWidget(self.plot)
         right.addWidget(self._build_tabs())
         right.setStretchFactor(0, 1)
@@ -129,6 +133,7 @@ class FFTWindow(QMainWindow):
         right.setSizes([480, 220])
 
         splitter = QSplitter(Qt.Horizontal)
+        splitter.setObjectName("main")
         splitter.addWidget(left)
         splitter.addWidget(right)
         splitter.setStretchFactor(0, 0)
@@ -501,6 +506,7 @@ class FFTWindow(QMainWindow):
             self._replot()
 
     def closeEvent(self, event) -> None:
+        settings.save_window(self.window_name, self)
         self.manager.unregister(self)
         self.bridge.close()
         super().closeEvent(event)

@@ -66,6 +66,8 @@ class TimeProcessingWindow(QMainWindow):
 
         self._build_ui()
         self._build_menus()
+        # a layout saved by a previous session replaces the defaults
+        settings.restore_window(self.window_name, self)
 
         self.bridge.changed.connect(self._refresh_list)
         self.bridge.changed.connect(self._refresh_tabs)
@@ -136,6 +138,7 @@ class TimeProcessingWindow(QMainWindow):
         details_layout.addWidget(self.details, 1)
 
         left = QSplitter(Qt.Vertical)
+        left.setObjectName("left")
         left.setContentsMargins(6, 6, 6, 6)
         left.addWidget(list_panel)
         left.addWidget(details_panel)
@@ -159,12 +162,14 @@ class TimeProcessingWindow(QMainWindow):
         self.tabs.currentChanged.connect(lambda _: self._refresh_tabs())
 
         right = QSplitter(Qt.Vertical)
+        right.setObjectName("right")
         right.addWidget(self.plot)
         right.addWidget(self.tabs)
         right.setStretchFactor(0, 1)
         right.setSizes([440, 260])
 
         splitter = QSplitter(Qt.Horizontal)
+        splitter.setObjectName("main")
         splitter.addWidget(left)
         splitter.addWidget(right)
         splitter.setStretchFactor(0, 0)
@@ -760,6 +765,7 @@ class TimeProcessingWindow(QMainWindow):
         # the last one closed wins, which is the same rule as any other
         # remembered layout.
         settings.save_header(_SIGNAL_TABLE, self.tree.header())
+        settings.save_window(self.window_name, self)
         self.manager.unregister(self)
         self.bridge.close()
         super().closeEvent(event)
