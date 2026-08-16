@@ -44,6 +44,11 @@ from .plotting import SpwbPlot, curve_pen
 
 __all__ = ["TimeProcessingWindow"]
 
+#: starting widths for the signal table, in the header's own order. The name
+#: gets the room because it is the column that actually varies in length -
+#: "Sine 1 Vpk + 3 V offset" should be readable without dragging anything.
+_COLUMN_WIDTHS = (240, 80, 80, 95, 60)
+
 
 
 class TimeProcessingWindow(QMainWindow):
@@ -81,10 +86,18 @@ class TimeProcessingWindow(QMainWindow):
         self.tree.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.tree.itemChanged.connect(self._on_item_changed)
         self.tree.itemSelectionChanged.connect(self._on_selection_changed)
+        # Interactive, not Stretch or ResizeToContents: those two compute the
+        # width themselves and Qt will not let the divider be dragged, which
+        # leaves a long signal name elided with no way to widen it. Widths
+        # are set once here and then belong to the user - _refresh_list
+        # rebuilds the rows but never touches the header, so a column stays
+        # where it was put.
         header = self.tree.header()
-        header.setSectionResizeMode(0, QHeaderView.Stretch)
-        for col in range(1, self.tree.columnCount()):
-            header.setSectionResizeMode(col, QHeaderView.ResizeToContents)
+        header.setSectionResizeMode(QHeaderView.Interactive)
+        header.setStretchLastSection(False)
+        header.setSectionsMovable(True)
+        for col, width in enumerate(_COLUMN_WIDTHS):
+            self.tree.setColumnWidth(col, width)
 
         delete_btn = QPushButton("Delete Selected")
         delete_btn.clicked.connect(self.delete_selected)

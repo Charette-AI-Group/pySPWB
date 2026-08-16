@@ -254,3 +254,39 @@ def test_the_signal_list_and_attributes_box_are_user_adjustable(qapp):
         assert left.sizes()[1] == 0
     finally:
         window.close()
+
+
+def test_signal_table_columns_can_be_resized_by_the_user(qapp):
+    """Stretch and ResizeToContents look fine but cannot be dragged.
+
+    Qt only lets a divider be dragged in Interactive or Fixed mode; the
+    other two compute the width themselves, which left long signal names
+    elided with no way to widen the column.
+    """
+    from PySide6.QtWidgets import QHeaderView
+
+    window = TimeProcessingWindow(WindowManager())
+    try:
+        header = window.tree.header()
+        for col in range(window.tree.columnCount()):
+            assert header.sectionResizeMode(col) == QHeaderView.Interactive, (
+                f"column {col} cannot be dragged")
+        assert not header.stretchLastSection()
+        assert window.tree.columnWidth(0) > window.tree.columnWidth(1)
+    finally:
+        window.close()
+
+
+def test_column_widths_survive_a_list_rebuild(qapp):
+    """_refresh_list clears the tree on every change; widths must persist."""
+    window = TimeProcessingWindow(WindowManager())
+    try:
+        window.store.add(Signal("first", np.zeros(64), 0.01, y_unit="V"))
+        window.tree.setColumnWidth(0, 337)
+
+        window.store.add(Signal("second", np.zeros(64), 0.01, y_unit="V"))
+
+        assert window.tree.topLevelItemCount() == 2
+        assert window.tree.columnWidth(0) == 337
+    finally:
+        window.close()
