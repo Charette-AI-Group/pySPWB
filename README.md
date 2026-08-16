@@ -466,6 +466,12 @@ zooming in re-renders from the full data. `setClipToView` is deliberately
 *not* set — it makes a curve report only the data inside the view, which
 stops autoscale seeing the rest, and measuring showed it buys nothing.
 
+The legend gets a backing panel at `LEGEND_OPACITY` with a faint border.
+pyqtgraph's default is transparent, so on a dense plot the labels sit
+directly on the traces and disappear. It is not *fully* opaque — a curve
+passing behind stays faintly visible, so it still reads as an overlay
+rather than a hole punched in the plot.
+
 Data traces are drawn at `CURVE_WIDTH` (2px) against the 1px grid and axes.
 At equal width a trace reads as part of the background rather than as the
 measurement. Whole pixels on purpose — a fractional width antialiases into a

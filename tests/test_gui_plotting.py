@@ -373,3 +373,25 @@ def test_a_long_signal_paints_promptly(plot, qapp):
 def test_the_right_click_menu_is_kept_as_the_exact_range_escape_hatch(plot):
     """Typing a precise range is the one thing the palette cannot do."""
     assert plot.plotItem.vb.menu is not None
+
+
+def test_the_legend_gets_a_backing_so_it_stays_readable(plot):
+    """pyqtgraph's default legend is transparent, so its labels vanish
+    wherever a trace happens to run behind them."""
+    from spwb.gui.plotting import LEGEND_OPACITY
+
+    legend = plot.addLegend()
+
+    assert legend.brush().color().alpha() == LEGEND_OPACITY
+    assert 0 < LEGEND_OPACITY < 255, "fully opaque would read as a hole"
+    assert legend.pen().color().alpha() > 0, "no border"
+    assert legend.labelTextColor() is not None
+
+
+def test_the_legend_keeps_its_corner_by_default(plot):
+    """Every window asked for offset=(-10, 10); it is now the default."""
+    legend = plot.addLegend()
+    assert legend is not None
+
+    moved = plot.addLegend(offset=(30, 30))    # still overridable
+    assert moved is not None

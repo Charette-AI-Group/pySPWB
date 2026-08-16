@@ -44,8 +44,8 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-__all__ = ["CURVE_WIDTH", "GRID_ALPHA", "PEN_COLOURS", "TOOLS",
-           "GraphViewBox", "SpwbPlot", "curve_pen"]
+__all__ = ["CURVE_WIDTH", "GRID_ALPHA", "LEGEND_OPACITY", "PEN_COLOURS",
+           "TOOLS", "GraphViewBox", "SpwbPlot", "curve_pen"]
 
 # Antialiasing is off, deliberately, and it is not a cosmetic preference.
 # Qt's raster engine has a fast path for 1px cosmetic pens; any wider pen
@@ -72,6 +72,14 @@ CURVE_WIDTH = 2
 #: Grid opacity. Kept low so the grid reads as a background reference and
 #: the traces sit in front of it; it still gives the eye a scale.
 GRID_ALPHA = 0.2
+
+#: Legend backing, 0-255. Nearly opaque so labels stay readable over a
+#: dense trace, but not fully - a curve passing behind stays faintly
+#: visible, which keeps the legend reading as an overlay rather than a
+#: hole punched in the plot.
+LEGEND_OPACITY = 235
+#: the legend's border, much fainter than the text it encloses
+LEGEND_BORDER_ALPHA = 90
 
 #: the trace colour cycle, shared by every window so the same signal keeps
 #: its colour when it is sent from one to another
@@ -395,6 +403,27 @@ class SpwbPlot(QWidget):
 
     def set_palette_visible(self, visible: bool) -> None:
         self.toolbar.setVisible(visible)
+
+    def addLegend(self, *args, **kwargs):
+        """A legend that stays readable whatever is drawn behind it.
+
+        pyqtgraph's default legend has no background, so its labels sit
+        directly on the traces and vanish wherever a curve happens to run
+        through them. Giving it the plot's own background colour - nearly
+        opaque, with a faint border so it still reads as an overlay rather
+        than a hole - keeps it legible on a dense plot without hiding much
+        of the data.
+        """
+        kwargs.setdefault("offset", (-10, 10))
+        legend = self.plot_widget.addLegend(*args, **kwargs)
+        backing = QColor(self._bg)
+        backing.setAlpha(LEGEND_OPACITY)
+        border = QColor(self._fg)
+        border.setAlpha(LEGEND_BORDER_ALPHA)
+        legend.setBrush(pg.mkBrush(backing))
+        legend.setPen(pg.mkPen(border, width=1))
+        legend.setLabelTextColor(self._fg)
+        return legend
 
     # -- behave like the PlotWidget we wrap ---------------------------------
     def __getattr__(self, name: str):
