@@ -49,6 +49,9 @@ __all__ = ["TimeProcessingWindow"]
 #: "Sine 1 Vpk + 3 V offset" should be readable without dragging anything.
 _COLUMN_WIDTHS = (240, 80, 80, 95, 60)
 
+#: settings key for the signal table's remembered layout
+_SIGNAL_TABLE = "signal_table"
+
 
 
 class TimeProcessingWindow(QMainWindow):
@@ -98,6 +101,8 @@ class TimeProcessingWindow(QMainWindow):
         header.setSectionsMovable(True)
         for col, width in enumerate(_COLUMN_WIDTHS):
             self.tree.setColumnWidth(col, width)
+        # a layout saved by a previous session replaces those defaults
+        settings.restore_header(_SIGNAL_TABLE, header)
 
         delete_btn = QPushButton("Delete Selected")
         delete_btn.clicked.connect(self.delete_selected)
@@ -750,6 +755,11 @@ class TimeProcessingWindow(QMainWindow):
 
     # -- lifecycle -----------------------------------------------------------
     def closeEvent(self, event) -> None:
+        # Saved on close rather than on every drag: sectionResized fires
+        # continuously while the divider moves. With several windows open
+        # the last one closed wins, which is the same rule as any other
+        # remembered layout.
+        settings.save_header(_SIGNAL_TABLE, self.tree.header())
         self.manager.unregister(self)
         self.bridge.close()
         super().closeEvent(event)

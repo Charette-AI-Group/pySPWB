@@ -1,4 +1,4 @@
-"""Persistent application settings - currently the remembered folders.
+"""Persistent application settings: remembered folders and table layouts.
 
 Browsing back to the same directory on every import is one of those small
 frictions that adds up, so the folder last used is stored **per file type
@@ -22,6 +22,11 @@ so a call site cannot accidentally do one without the other::
 
     path = settings.open_file(self, "Open TDMS File", "tdms",
                               "National Instruments (*.tdms)")
+
+Table layouts work the same way: :func:`restore_header` after building a
+header, :func:`save_header` on close. Column widths and column order both
+ride in Qt's own state blob, so adding a column needs no new code here -
+only a :data:`HEADER_VERSION` bump so stale layouts are discarded.
 """
 from __future__ import annotations
 
@@ -29,17 +34,20 @@ import os
 from pathlib import Path
 
 from PySide6.QtCore import QSettings
-from PySide6.QtWidgets import QFileDialog, QWidget
+from PySide6.QtWidgets import QFileDialog, QHeaderView, QWidget
 
 __all__ = [
     "KINDS",
     "MODES",
     "forget_dirs",
+    "forget_layout",
     "last_dir",
     "open_file",
     "open_files",
     "remember_dir",
+    "restore_header",
     "save_file",
+    "save_header",
 ]
 
 #: file-type slugs, one remembered folder per (kind, mode) pair. Slugs are
@@ -50,6 +58,14 @@ KINDS: tuple[str, ...] = ("hdf5", "tdms", "wave", "text", "rpc", "head_hdf")
 MODES: tuple[str, ...] = ("open", "save")
 
 _GROUP = "paths"
+_LAYOUT = "layout"
+
+#: Bump whenever a table's columns change. Unlike ``QMainWindow``,
+#: ``QHeaderView.saveState`` takes no version argument, so the check is
+#: done here: a layout saved under a different version is discarded rather
+#: than restoring widths onto columns that have since moved or been
+#: renamed, which would look like corruption to the user.
+HEADER_VERSION = 1
 
 
 def _key(kind: str, mode: str) -> str:
@@ -97,6 +113,42 @@ def forget_dirs() -> None:
     """Drop every remembered folder, so browsing starts at home again."""
     store = _store()
     store.remove(_GROUP)
+    store.sync()
+
+
+# -- table layouts ---------------------------------------------------------
+def save_header(name: str, header: QHeaderView) -> None:
+    """Remember a table's column order, widths and sort for next time.
+
+    ``QHeaderView.saveState`` packs all of it into one blob, so there is
+    nothing to keep in step by hand when a column is added.
+    """
+    store = _store()
+    store.setValue(f"{_LAYOUT}/{name}/state", header.saveState())
+    store.setValue(f"{_LAYOUT}/{name}/version", HEADER_VERSION)
+
+
+def restore_header(name: str, header: QHeaderView) -> bool:
+    """Re-apply a saved layout. Returns whether one was found and used.
+
+    ``False`` means the caller's defaults stand - either nothing was saved
+    yet, or it was saved under a different :data:`HEADER_VERSION`, meaning
+    the columns have changed since and the old widths no longer describe
+    this table.
+    """
+    store = _store()
+    if store.value(f"{_LAYOUT}/{name}/version", 0, type=int) != HEADER_VERSION:
+        return False
+    state = store.value(f"{_LAYOUT}/{name}/state")
+    if not state:
+        return False
+    return bool(header.restoreState(state))
+
+
+def forget_layout() -> None:
+    """Drop every saved table layout, so the defaults come back."""
+    store = _store()
+    store.remove(_LAYOUT)
     store.sync()
 
 

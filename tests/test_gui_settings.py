@@ -224,3 +224,80 @@ def test_the_window_remembers_where_a_signal_was_opened_from(
         assert settings.last_dir("hdf5", "save") == str(home)
     finally:
         window.close()
+
+
+# -- remembered table layouts ----------------------------------------------
+def _window():
+    from spwb.gui.bridge import WindowManager
+    from spwb.gui.time_processing import TimeProcessingWindow
+    return TimeProcessingWindow(WindowManager())
+
+
+def test_column_widths_and_order_survive_a_restart(store, qapp):
+    pytest.importorskip("pyqtgraph")
+
+    first = _window()
+    try:
+        first.tree.setColumnWidth(0, 333)
+        first.tree.setColumnWidth(4, 111)
+        first.tree.header().moveSection(4, 0)      # drag Unit to the front
+    finally:
+        first.close()                              # saving happens on close
+
+    second = _window()
+    try:
+        assert second.tree.columnWidth(0) == 333
+        assert second.tree.columnWidth(4) == 111
+        assert second.tree.header().logicalIndex(0) == 4
+    finally:
+        second.close()
+
+
+def test_a_layout_from_a_different_column_set_is_discarded(store, qapp,
+                                                           monkeypatch):
+    """Bumping HEADER_VERSION must fall back to defaults, not misapply."""
+    pytest.importorskip("pyqtgraph")
+
+    first = _window()
+    try:
+        first.tree.setColumnWidth(0, 333)
+    finally:
+        first.close()
+
+    monkeypatch.setattr(settings, "HEADER_VERSION",
+                        settings.HEADER_VERSION + 1)
+    second = _window()
+    try:
+        assert second.tree.columnWidth(0) != 333
+    finally:
+        second.close()
+
+
+def test_forget_layout_brings_the_defaults_back(store, qapp):
+    pytest.importorskip("pyqtgraph")
+
+    first = _window()
+    try:
+        first.tree.setColumnWidth(0, 333)
+    finally:
+        first.close()
+
+    settings.forget_layout()
+
+    second = _window()
+    try:
+        assert second.tree.columnWidth(0) != 333
+    finally:
+        second.close()
+
+
+def test_restore_header_reports_whether_it_did_anything(store, qapp):
+    from PySide6.QtWidgets import QTreeWidget
+
+    tree = QTreeWidget()
+    tree.setHeaderLabels(["a", "b"])
+
+    assert settings.restore_header("never_saved", tree.header()) is False
+
+    settings.save_header("saved", tree.header())
+    assert settings.restore_header("saved", tree.header()) is True

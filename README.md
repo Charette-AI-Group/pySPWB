@@ -113,7 +113,7 @@ ridge = spec.freqs[spec.data.argmax(axis=1)]  # dominant frequency vs time
 | `processing.io.text` — text/CSV read **and** write, Excel-facing schema, locale separators, text FRF reader | ✅ round-trips exactly |
 | `gui` — Text/CSV open and save in the Time Processing window | ✅ runs |
 | `gui.plotting` — LabVIEW-style graph palette on every plot: pan, rect / X / Y zoom, fit, undo | ✅ runs |
-| `gui.settings` — remembers the last browse folder per file type and operation | ✅ runs |
+| `gui.settings` — remembers the last browse folder per file type and operation, and the signal table's column layout | ✅ runs |
 
 ## Numerical fidelity
 
@@ -498,6 +498,11 @@ All eleven dialogs go through `settings.open_file` / `open_files` /
 `save_file` rather than `QFileDialog` directly, so a call site cannot read
 the remembered folder without also recording the new one. `forget_dirs()`
 clears the lot.
+
+The signal table's **column widths and order** are remembered the same way,
+in Qt's own header state blob, restored on open and saved on close. A
+`HEADER_VERSION` guard discards a layout saved before the columns changed,
+rather than restoring old widths onto columns that have since moved.
 
 ### Architecture
 
