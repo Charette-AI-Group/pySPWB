@@ -35,7 +35,7 @@ from PySide6.QtWidgets import (
 
 from ..processing.model.signal import Signal
 from ..processing.model.store import SignalStore
-from . import settings
+from . import about, settings
 from .analysis_tabs import ScaleSignalsTab, StatsTab, TVMetricsTab
 from .bridge import StoreBridge, WindowManager
 from .dialogs import ChannelSelectDialog, CreateSignalDialog, ImportFromWindowDialog
@@ -751,13 +751,9 @@ class TimeProcessingWindow(QMainWindow):
         return window
 
     def show_about(self) -> None:
-        from .. import __version__
-        QMessageBox.about(
-            self, "About SPWB",
-            f"<h3>Signal Processing Work Bench</h3>"
-            f"<p>Python port, version {__version__}</p>"
-            f"<p>Original LabVIEW application by Charette AI Group, "
-            f"open-sourced under the MIT license.</p>")
+        if about.show_about(self):
+            self.statusBar().showMessage(
+                "Thank you - the donation page is opening in your browser.")
 
     # -- lifecycle -----------------------------------------------------------
     def closeEvent(self, event) -> None:

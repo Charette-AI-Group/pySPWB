@@ -115,6 +115,7 @@ ridge = spec.freqs[spec.data.argmax(axis=1)]  # dominant frequency vs time
 | `gui.plotting` — LabVIEW-style graph palette on every plot: pan, rect / X / Y zoom, fit, undo | ✅ runs |
 | `gui.settings` — remembers browse folders per file type and operation, plus window geometry, splitters and column layout | ✅ runs |
 | `gui.flow_layout` — wrapping control rows, so the window fits a laptop screen | ✅ runs |
+| `gui.about` — About dialog matching the sibling Charette AI Group apps, with Donate | ✅ runs |
 
 ## Numerical fidelity
 
