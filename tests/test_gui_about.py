@@ -15,6 +15,7 @@ pytest.importorskip("PySide6")
 
 from PySide6.QtWidgets import QApplication
 
+from spwb import app_config
 from spwb.gui import about
 
 
@@ -24,24 +25,22 @@ def qapp():
 
 
 def test_the_text_carries_the_credits_and_version(qapp):
-    from spwb import __version__
-
     html = about.about_html(2026)
 
-    assert about.APP_NAME in html
-    assert __version__ in html
-    assert about.EDITOR in html
-    assert about.AI_AGENT in html
+    assert app_config.APP_TITLE in html
+    assert app_config.APP_VERSION in html
+    assert app_config.EDITOR in html
+    assert app_config.AI_AGENT in html
     assert "2026" in html
-    assert about.COPYRIGHT_HOLDER in html
+    assert app_config.COPYRIGHT_HOLDER in html
     assert "MIT" in html
 
 
 def test_both_repositories_are_linked(qapp):
     html = about.about_html()
 
-    assert f'href="{about.REPO_URL}"' in html
-    assert f'href="{about.LABVIEW_REPO_URL}"' in html
+    assert f'href="{app_config.REPO_URL}"' in html
+    assert f'href="{app_config.LABVIEW_REPO_URL}"' in html
 
 
 def test_donate_uses_the_same_paypal_button_as_the_readme(qapp):

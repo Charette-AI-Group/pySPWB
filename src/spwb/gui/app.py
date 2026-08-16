@@ -4,8 +4,10 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
+from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QApplication
 
+from .. import app_config
 from .bridge import WindowManager
 from .time_processing import TimeProcessingWindow
 
@@ -15,8 +17,13 @@ __all__ = ["main"]
 def main(argv: list[str] | None = None) -> int:
     argv = list(sys.argv if argv is None else argv)
     app = QApplication.instance() or QApplication(argv)
-    app.setApplicationName("SPWB")
-    app.setOrganizationName("Charette AI Group")
+    app.setApplicationName(app_config.APP_NAME)
+    app.setOrganizationName(app_config.ORGANIZATION_NAME)
+    app.setApplicationVersion(app_config.APP_VERSION)
+    # No icon has been added yet; when one is dropped into resources/ this
+    # picks it up with no further change.
+    if (icon := app_config.icon_file()) is not None:
+        app.setWindowIcon(QIcon(str(icon)))
 
     manager = WindowManager()
     window = TimeProcessingWindow(manager)

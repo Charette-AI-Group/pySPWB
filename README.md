@@ -40,6 +40,8 @@ src/spwb/
 │   ├── dsp/           windows, spectra, transfer functions, metrics
 │   └── io/            file formats (HDF5, TDMS, WAV, CSV; read-only:
 │                      RPC-III, Nastran punch, HEAD acoustics)
+├── app_config.py      names, credits, links, brand colours, paths — Qt-free
+├── resources/         bundled files (icon); ships in the wheel
 └── gui/               the PySide6 application — the ONLY package that
                        may import Qt; a pure client of processing/
 ```
@@ -116,6 +118,7 @@ ridge = spec.freqs[spec.data.argmax(axis=1)]  # dominant frequency vs time
 | `gui.settings` — remembers browse folders per file type and operation, plus window geometry, splitters and column layout | ✅ runs |
 | `gui.flow_layout` — wrapping control rows, so the window fits a laptop screen | ✅ runs |
 | `gui.about` — About dialog matching the sibling Charette AI Group apps, with Donate | ✅ runs |
+| `app_config` — one home for names, credits, links, colours and resource paths | ✅ runs |
 
 ## Numerical fidelity
 

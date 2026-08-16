@@ -50,6 +50,12 @@ Issues = "https://github.com/Charette-AI-Group/pySPWB/issues"
 [tool.setuptools.packages.find]
 where = ["src"]
 
+# Anything dropped into src/spwb/resources (an application icon, say) ships
+# in the wheel. Without this the file works from a source checkout and is
+# silently missing from an installed copy.
+[tool.setuptools.package-data]
+spwb = ["resources/*"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 
