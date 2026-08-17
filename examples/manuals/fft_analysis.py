@@ -15,7 +15,7 @@
 # # FFT Analysis — worked examples
 #
 # The companion notebook to the [FFT Analysis
-# manual](../../docs/manuals/fft-analysis.md). Same five examples, same demo
+# manual](https://github.com/Charette-AI-Group/pySPWB/blob/main/docs/manuals/fft-analysis.md). Same five examples, same demo
 # files, same numbers — computed here in a few lines of `spwb.processing`
 # instead of clicked in the application.
 #
@@ -164,7 +164,7 @@ print("ready")
 # 400 Hz with amplitudes of exactly 1.00, 0.50 and 0.25 V.
 #
 # Manual: [Worked example
-# 1](../../docs/manuals/fft-analysis.md#worked-example-1--amplitudes-you-can-trust).
+# 1](https://github.com/Charette-AI-Group/pySPWB/blob/main/docs/manuals/fft-analysis.md#worked-example-1--amplitudes-you-can-trust).
 #
 # The whole chain is two calls. `auto_power_spectrums` does what the
 # **Spectral Function Parameters** group does — block, window, transform,
@@ -240,7 +240,7 @@ print("section 1 OK - amplitudes read 1.00 / 0.50 / 0.25 as the file claims")
 # at exactly 100.0 Hz and once at 100.5 Hz, half a bin off.
 #
 # Manual: [Worked example
-# 2](../../docs/manuals/fft-analysis.md#worked-example-2--leakage-and-what-the-window-is-for).
+# 2](https://github.com/Charette-AI-Group/pySPWB/blob/main/docs/manuals/fft-analysis.md#worked-example-2--leakage-and-what-the-window-is-for).
 #
 # This is the one that catches people out. Nothing is wrong with the signal
 # and nothing is wrong with the software: a tone that falls between two bins
@@ -312,7 +312,7 @@ print(f"section 2 OK - Hanning under-reads by {100 * (1 - hanning_off):.1f} %, "
 # RMS, the same tone at 0.1 Pa, and pink noise at 1 Pa RMS overall.
 #
 # Manual: [Worked example
-# 3](../../docs/manuals/fft-analysis.md#worked-example-3--decibels-and-the-94-db-calibrator).
+# 3](https://github.com/Charette-AI-Group/pySPWB/blob/main/docs/manuals/fft-analysis.md#worked-example-3--decibels-and-the-94-db-calibrator).
 #
 # 1 Pa RMS is what an acoustic calibrator produces, and referred to 20 µPa
 # it is the familiar "94 dB".
@@ -390,7 +390,7 @@ print("section 3 OK - 93.98 dB, the quieter tone exactly 20 dB down, "
 # amplitude at the octave centres from 31.5 Hz to 16 kHz.
 #
 # Manual: [Worked example
-# 4](../../docs/manuals/fft-analysis.md#worked-example-4--a-weighting).
+# 4](https://github.com/Charette-AI-Group/pySPWB/blob/main/docs/manuals/fft-analysis.md#worked-example-4--a-weighting).
 #
 # Because the tones are equal, whatever shape the weighted plot takes *is*
 # the weighting curve. A-weighting is the inverse of Fletcher and Munson's
@@ -461,7 +461,7 @@ print("section 4 OK - the curve matches IEC 61672 within 0.25 dB, "
 # exactly 11.22 %.
 #
 # Manual: [Worked example
-# 5](../../docs/manuals/fft-analysis.md#worked-example-5--harmonics-thd-and-the-energy-band-tab).
+# 5](https://github.com/Charette-AI-Group/pySPWB/blob/main/docs/manuals/fft-analysis.md#worked-example-5--harmonics-thd-and-the-energy-band-tab).
 #
 # Displaying peak amplitude in plain dB puts the fundamental on 0 dB, which
 # makes every other peak a distortion figure you can read directly.
@@ -547,10 +547,10 @@ print(f"section 5 OK - THD {100 * from_bands:.2f} % by both routes, "
 # %% [markdown]
 # ## Where to go next
 #
-# * The [FFT Analysis manual](../../docs/manuals/fft-analysis.md) — the same
+# * The [FFT Analysis manual](https://github.com/Charette-AI-Group/pySPWB/blob/main/docs/manuals/fft-analysis.md) — the same
 #   five examples driven through the application, plus the history of where
 #   all of this came from and a reference table for every control.
-# * [`examples/01_spectrum_from_a_file.py`](../01_spectrum_from_a_file.py) —
+# * [`examples/01_spectrum_from_a_file.py`](https://github.com/Charette-AI-Group/pySPWB/blob/main/examples/01_spectrum_from_a_file.py) —
 #   the same workflow on your own recording, including saving results back
 #   out to TDMS.
 # * `python tools/verify_demo_data.py` — the 27 assertions that keep the

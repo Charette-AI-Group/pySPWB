@@ -63,7 +63,17 @@ python tools/make_example_notebooks.py
 
 Edit the `.py`, never the `.ipynb`. The builder assigns cell ids by
 position and discards execution timings, so rebuilding an unchanged example
-produces byte-identical output and a rebuild is not a diff. Every section
+produces byte-identical output and a rebuild is not a diff.
+
+**Cross-links inside a notebook must be absolute URLs**, and
+`tests/test_examples.py` enforces it. The source lives in
+`examples/manuals/` while the notebook built from it is published from
+`docs/manuals/notebooks/`, so a path relative to one is wrong from the
+other — `../../docs/manuals/x.md` looks right in the source and resolves to
+`docs/docs/manuals/x.md` in the published notebook, which is a 404. An
+absolute link is correct from both, and from Jupyter, VS Code and nbviewer
+too. The manuals themselves are not relocated, so their relative links are
+fine and should stay relative. Every section
 of a notebook ends with `assert`s on the numbers its manual quotes, and
 `tests/test_examples.py` runs the scripts — with matplotlib alone, no
 Jupyter — so documentation drift fails the suite.

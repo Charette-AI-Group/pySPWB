@@ -15,7 +15,7 @@
 # # Adaptive Filtering — worked examples
 #
 # The companion notebook to the [Adaptive Filtering
-# manual](../../docs/manuals/adaptive-filtering.md). Same three examples,
+# manual](https://github.com/Charette-AI-Group/pySPWB/blob/main/docs/manuals/adaptive-filtering.md). Same three examples,
 # same demo file, same numbers — computed here in a few lines of
 # `spwb.processing` instead of clicked in the application.
 #
@@ -144,7 +144,7 @@ print("ready")
 # as ground truth so the answer can be checked.
 #
 # Manual: [Worked example
-# 1](../../docs/manuals/adaptive-filtering.md#worked-example-1--rescuing-a-buried-tone).
+# 1](https://github.com/Charette-AI-Group/pySPWB/blob/main/docs/manuals/adaptive-filtering.md#worked-example-1--rescuing-a-buried-tone).
 
 # %%
 print(f"  {'signal':34} {'rms':>9} {'120 Hz peak':>12}")
@@ -232,7 +232,7 @@ print(f"section 1 OK - {result.noise_reduction_db:+.2f} dB, tone recovered at "
 # than that **cannot represent the path**, however long it adapts.
 #
 # Manual: [Worked example
-# 2](../../docs/manuals/adaptive-filtering.md#worked-example-2--filter-length-the-control-that-decides-everything).
+# 2](https://github.com/Charette-AI-Group/pySPWB/blob/main/docs/manuals/adaptive-filtering.md#worked-example-2--filter-length-the-control-that-decides-everything).
 
 # %%
 print(f"  {'taps':>6} {'dB':>8} {'converged':>10} {'residual':>10}")
@@ -275,7 +275,7 @@ print(f"section 2 OK - {lengths[16][0]:.2f} dB at 16 taps against "
 # ## 3. Step size, and what convergence does not tell you
 #
 # Manual: [Worked example
-# 3](../../docs/manuals/adaptive-filtering.md#worked-example-3--step-size-and-what-convergence-does-not-tell-you).
+# 3](https://github.com/Charette-AI-Group/pySPWB/blob/main/docs/manuals/adaptive-filtering.md#worked-example-3--step-size-and-what-convergence-does-not-tell-you).
 
 # %%
 print(f"  {'step':>7} {'dB':>8} {'residual':>10}   (accuracy once settled)")
@@ -349,15 +349,15 @@ print("section 3 OK - small steps are more accurate, 2 taps 'converges' to "
 # %% [markdown]
 # ## Where to go next
 #
-# * The [Adaptive Filtering manual](../../docs/manuals/adaptive-filtering.md)
+# * The [Adaptive Filtering manual](https://github.com/Charette-AI-Group/pySPWB/blob/main/docs/manuals/adaptive-filtering.md)
 #   - the same three examples driven through the application, plus the
 #   history from Widrow and Hoff's 1960 learning rule to the fetal
 #   heartbeat that made the method famous.
 # * The other four manuals and their notebooks:
-#   [`time_processing.py`](time_processing.py),
-#   [`fft_analysis.py`](fft_analysis.py),
-#   [`transfer_function.py`](transfer_function.py),
-#   [`time_frequency.py`](time_frequency.py).
+#   [`time_processing.py`](https://github.com/Charette-AI-Group/pySPWB/blob/main/examples/manuals/time_processing.py),
+#   [`fft_analysis.py`](https://github.com/Charette-AI-Group/pySPWB/blob/main/examples/manuals/fft_analysis.py),
+#   [`transfer_function.py`](https://github.com/Charette-AI-Group/pySPWB/blob/main/examples/manuals/transfer_function.py),
+#   [`time_frequency.py`](https://github.com/Charette-AI-Group/pySPWB/blob/main/examples/manuals/time_frequency.py).
 # * `python tools/verify_demo_data.py` - the assertions that keep the demo
 #   datasets honest.
 #

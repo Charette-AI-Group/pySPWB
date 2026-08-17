@@ -12,6 +12,7 @@ working directory, so a script that quietly depended on the caller's state
 or wrote stray files would be caught.
 """
 import os
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -25,10 +26,41 @@ pytest.importorskip("h5py", reason="the demo datasets are HDF5")
 REPO = Path(__file__).resolve().parents[1]
 EXAMPLES = sorted((REPO / "examples" / "manuals").glob("*.py"))
 
+#: a markdown link target, e.g. the "x.md" of "[see](x.md)"
+_LINK = re.compile(r"\]\(([^)]+)\)")
+
 
 def test_there_are_examples_to_run():
     """A glob that silently matches nothing would make this file a no-op."""
     assert EXAMPLES, "no percent-format examples in examples/manuals/"
+
+
+@pytest.mark.parametrize("script", EXAMPLES, ids=lambda p: p.stem)
+def test_cross_links_are_absolute(script):
+    """A relative link cannot be correct in both places these files live.
+
+    The source sits in ``examples/manuals/`` and the notebook built from it
+    is published from ``docs/manuals/notebooks/``, so a path relative to one
+    is wrong from the other. That is not hypothetical: ``../../docs/manuals``
+    resolved to ``docs/docs/manuals`` in every published notebook and 404'd
+    on GitHub, while looking perfectly correct in the source.
+
+    Absolute links are right from both, and from Jupyter, VS Code and
+    nbviewer as well. In-page anchors are fine - they never leave the file.
+    """
+    offenders = []
+    for number, line in enumerate(
+            script.read_text(encoding="utf8").splitlines(), start=1):
+        if not line.lstrip().startswith("#"):
+            continue                       # code, not a markdown cell
+        for target in _LINK.findall(line):
+            if target.startswith(("http://", "https://", "#")):
+                continue
+            offenders.append(f"  {script.name}:{number} -> {target}")
+
+    assert not offenders, (
+        "relative cross-links break once the notebook is published from "
+        "docs/manuals/notebooks/:\n" + "\n".join(offenders))
 
 
 @pytest.mark.slow

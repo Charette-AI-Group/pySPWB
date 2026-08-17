@@ -15,7 +15,7 @@
 # # Time Processing — worked examples
 #
 # The companion notebook to the [Time Processing
-# manual](../../docs/manuals/time-processing.md). Same three examples, same
+# manual](https://github.com/Charette-AI-Group/pySPWB/blob/main/docs/manuals/time-processing.md). Same three examples, same
 # demo files, same numbers — computed here in a few lines of
 # `spwb.processing` instead of clicked in the application.
 #
@@ -143,7 +143,7 @@ print("ready")
 # statistics are all textbook values, at 8192 Hz for 8 s.
 #
 # Manual: [Worked example
-# 1](../../docs/manuals/time-processing.md#worked-example-1--statistics-you-can-check).
+# 1](https://github.com/Charette-AI-Group/pySPWB/blob/main/docs/manuals/time-processing.md#worked-example-1--statistics-you-can-check).
 #
 # `signal_statistics` is one call and returns one row of the Stats tab.
 
@@ -217,7 +217,7 @@ print("section 1 OK - sine 0.7071/1.4142, square crest exactly 1, "
 # already in g so you can check your work.
 #
 # Manual: [Worked example
-# 2](../../docs/manuals/time-processing.md#worked-example-2--calibration-or-making-volts-mean-something).
+# 2](https://github.com/Charette-AI-Group/pySPWB/blob/main/docs/manuals/time-processing.md#worked-example-2--calibration-or-making-volts-mean-something).
 #
 # The **Calib Factor** is the reciprocal of the sensitivity: 100 mV/g is
 # 0.1 V per g, so the factor is 10.
@@ -295,7 +295,7 @@ print("section 2 OK - 0.2 V becomes 2.000000 g, matching the reference "
 # signals shaped so the right trend is unmistakable.
 #
 # Manual: [Worked example
-# 3](../../docs/manuals/time-processing.md#worked-example-3--trends-when-one-number-is-not-enough).
+# 3](https://github.com/Charette-AI-Group/pySPWB/blob/main/docs/manuals/time-processing.md#worked-example-3--trends-when-one-number-is-not-enough).
 #
 # A trend is a Signal in its own right, sampled at the step rather than at
 # the data rate — which is why the application can plot it over the data and
@@ -410,11 +410,11 @@ print("section 3 OK - staircase 0.25/0.50/0.75/1.00, sine kurtosis 1.4996, "
 # %% [markdown]
 # ## Where to go next
 #
-# * The [Time Processing manual](../../docs/manuals/time-processing.md) —
+# * The [Time Processing manual](https://github.com/Charette-AI-Group/pySPWB/blob/main/docs/manuals/time-processing.md) —
 #   the same three examples driven through the application, plus the history
 #   of where all of this came from and a reference table for every control.
-# * The [FFT Analysis manual](../../docs/manuals/fft-analysis.md) and its
-#   [notebook](fft_analysis.py) — where these signals go next.
+# * The [FFT Analysis manual](https://github.com/Charette-AI-Group/pySPWB/blob/main/docs/manuals/fft-analysis.md) and its
+#   [notebook](https://github.com/Charette-AI-Group/pySPWB/blob/main/examples/manuals/fft_analysis.py) — where these signals go next.
 # * `python tools/verify_demo_data.py` — the assertions that keep the demo
 #   datasets honest.
 #

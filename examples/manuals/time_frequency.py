@@ -15,7 +15,7 @@
 # # Time-Frequency — worked examples
 #
 # The companion notebook to the [Time-Frequency
-# manual](../../docs/manuals/time-frequency.md). Same three examples, same
+# manual](https://github.com/Charette-AI-Group/pySPWB/blob/main/docs/manuals/time-frequency.md). Same three examples, same
 # demo files, same numbers — computed here in a few lines of
 # `spwb.processing` instead of clicked in the application.
 #
@@ -139,7 +139,7 @@ print("ready")
 # 2000 Hz over 20 s, linearly; and the same endpoints swept logarithmically.
 #
 # Manual: [Worked example
-# 1](../../docs/manuals/time-frequency.md#worked-example-1--a-sweep-is-a-diagonal).
+# 1](https://github.com/Charette-AI-Group/pySPWB/blob/main/docs/manuals/time-frequency.md#worked-example-1--a-sweep-is-a-diagonal).
 
 # %%
 sweeps = load("12_TFA_Sweeps_linear_and_log.h5")
@@ -206,7 +206,7 @@ print(f"section 1 OK - the ridge tracks {slope:.2f} Hz/s against a true 99.0, "
 # a limitation of the method.
 #
 # Manual: [Worked example
-# 2](../../docs/manuals/time-frequency.md#worked-example-2--the-trade-you-cannot-avoid).
+# 2](https://github.com/Charette-AI-Group/pySPWB/blob/main/docs/manuals/time-frequency.md#worked-example-2--the-trade-you-cannot-avoid).
 
 # %%
 print(f"  {'block':>6} {'df (Hz)':>9} {'dt (ms)':>9} {'block (ms)':>11} "
@@ -263,7 +263,7 @@ print("section 2 OK - df x block length = 1.0000 exactly at every block size")
 # 1600 Hz from 9-14 s.
 #
 # Manual: [Worked example
-# 3](../../docs/manuals/time-frequency.md#worked-example-3--the-cursor-and-reading-a-value-off-the-picture).
+# 3](https://github.com/Charette-AI-Group/pySPWB/blob/main/docs/manuals/time-frequency.md#worked-example-3--the-cursor-and-reading-a-value-off-the-picture).
 
 # %%
 PLAN = ((100.0, 1.0, 4.0), (400.0, 3.0, 7.0),
@@ -335,7 +335,7 @@ plt.show()
 # centre.
 #
 # This is the scalloping loss from the [FFT
-# manual](../../docs/manuals/fft-analysis.md), in different units: a Hanning
+# manual](https://github.com/Charette-AI-Group/pySPWB/blob/main/docs/manuals/fft-analysis.md), in different units: a Hanning
 # window under-reads a half-bin-off tone to 0.849 of its amplitude, and
 # 10·log₁₀(0.849²) is -1.42 dB.
 
@@ -390,13 +390,13 @@ print(f"section 3 OK - 400 Hz reads {section.y[j400]:.2f} dB on the grid, "
 # %% [markdown]
 # ## Where to go next
 #
-# * The [Time-Frequency manual](../../docs/manuals/time-frequency.md) — the
+# * The [Time-Frequency manual](https://github.com/Charette-AI-Group/pySPWB/blob/main/docs/manuals/time-frequency.md) — the
 #   same three examples driven through the application, plus the history from
 #   Gabor's 1946 time-frequency plane to the Bell Labs sound spectrograph.
 # * The other manuals and their notebooks:
-#   [`time_processing.py`](time_processing.py),
-#   [`fft_analysis.py`](fft_analysis.py),
-#   [`transfer_function.py`](transfer_function.py).
+#   [`time_processing.py`](https://github.com/Charette-AI-Group/pySPWB/blob/main/examples/manuals/time_processing.py),
+#   [`fft_analysis.py`](https://github.com/Charette-AI-Group/pySPWB/blob/main/examples/manuals/fft_analysis.py),
+#   [`transfer_function.py`](https://github.com/Charette-AI-Group/pySPWB/blob/main/examples/manuals/transfer_function.py).
 # * `python tools/verify_demo_data.py` — the assertions that keep the demo
 #   datasets honest.
 #

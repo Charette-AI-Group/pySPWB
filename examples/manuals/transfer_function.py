@@ -15,7 +15,7 @@
 # # Transfer Function — worked examples
 #
 # The companion notebook to the [Transfer Function
-# manual](../../docs/manuals/transfer-function.md). Same three examples, same
+# manual](https://github.com/Charette-AI-Group/pySPWB/blob/main/docs/manuals/transfer-function.md). Same three examples, same
 # demo files, same numbers — computed here in a few lines of
 # `spwb.processing` instead of clicked in the application.
 #
@@ -137,7 +137,7 @@ print(f"the system under test: fn = {FN:g} Hz, zeta = {ZETA:g}, "
 # 8192 Hz.
 #
 # Manual: [Worked example
-# 1](../../docs/manuals/transfer-function.md#worked-example-1--a-resonance-you-already-know-the-answer-to).
+# 1](https://github.com/Charette-AI-Group/pySPWB/blob/main/docs/manuals/transfer-function.md#worked-example-1--a-resonance-you-already-know-the-answer-to).
 
 # %%
 sdof = load("09_TF_SDOF_resonance_H1.h5")
@@ -247,7 +247,7 @@ print("section 1 OK - DC gain 1.000, phase -89.90 deg at 80 Hz, "
 # did not cause. A clean copy is included to compare against.
 #
 # Manual: [Worked example
-# 2](../../docs/manuals/transfer-function.md#worked-example-2--coherence-or-how-much-of-this-did-the-input-cause).
+# 2](https://github.com/Charette-AI-Group/pySPWB/blob/main/docs/manuals/transfer-function.md#worked-example-2--coherence-or-how-much-of-this-did-the-input-cause).
 
 # %%
 partial = load("10_TF_Coherence_partial.h5")
@@ -322,7 +322,7 @@ print(f"section 2 OK - coherence {float(coh_bad.y[inside].mean()):.4f} inside "
 # response cleanly. This is the case H1 gets wrong.
 #
 # Manual: [Worked example
-# 3](../../docs/manuals/transfer-function.md#worked-example-3--h1-h2-and-where-the-noise-is).
+# 3](https://github.com/Charette-AI-Group/pySPWB/blob/main/docs/manuals/transfer-function.md#worked-example-3--h1-h2-and-where-the-noise-is).
 
 # %%
 noisy = load("11_TF_H1_vs_H2_input_noise.h5")
@@ -400,13 +400,13 @@ print(f"section 3 OK - H1/H2 = {ratio:.5f} = mean coherence {gamma:.5f}, "
 # %% [markdown]
 # ## Where to go next
 #
-# * The [Transfer Function manual](../../docs/manuals/transfer-function.md) —
+# * The [Transfer Function manual](https://github.com/Charette-AI-Group/pySPWB/blob/main/docs/manuals/transfer-function.md) —
 #   the same three examples driven through the application, plus the history
 #   from Black's feedback amplifier to Bendat and Piersol's coherence.
-# * The [Time Processing](../../docs/manuals/time-processing.md) and
-#   [FFT Analysis](../../docs/manuals/fft-analysis.md) manuals, and their
-#   notebooks: [`time_processing.py`](time_processing.py),
-#   [`fft_analysis.py`](fft_analysis.py).
+# * The [Time Processing](https://github.com/Charette-AI-Group/pySPWB/blob/main/docs/manuals/time-processing.md) and
+#   [FFT Analysis](https://github.com/Charette-AI-Group/pySPWB/blob/main/docs/manuals/fft-analysis.md) manuals, and their
+#   notebooks: [`time_processing.py`](https://github.com/Charette-AI-Group/pySPWB/blob/main/examples/manuals/time_processing.py),
+#   [`fft_analysis.py`](https://github.com/Charette-AI-Group/pySPWB/blob/main/examples/manuals/fft_analysis.py).
 # * `python tools/verify_demo_data.py` — the assertions that keep the demo
 #   datasets honest.
 #
