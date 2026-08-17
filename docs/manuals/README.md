@@ -9,7 +9,7 @@ application actually produces — not one derived on paper and hoped for.
 |---|---|---|---|
 | [Time Processing](time-processing.md) | The hub: files, statistics, calibration, trends | 01–03 | [notebook](notebooks/time-processing.ipynb) |
 | [FFT Analysis](fft-analysis.md) | Spectra, windows, dB, weighting, energy bands | 04–08 | [notebook](notebooks/fft-analysis.ipynb) |
-| Transfer Function | *(to be written)* | 09–11 | |
+| [Transfer Function](transfer-function.md) | Frequency response, coherence, H1/H2/H3 | 09–11 | [notebook](notebooks/transfer-function.ipynb) |
 | Time-Frequency Analysis | *(to be written)* | 12–13 | |
 | Adaptive Filtering (LMS) | *(to be written)* | 14 | |
 

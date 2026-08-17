@@ -36,6 +36,7 @@ nothing to download.
 |---|---|
 | [`manuals/time_processing.py`](manuals/time_processing.py) | The hub window: statistics against textbook values, sensitivity and calibration, normalisation, sliding-window trends. → [rendered notebook](../docs/manuals/notebooks/time-processing.ipynb) · [manual](../docs/manuals/time-processing.md) |
 | [`manuals/fft_analysis.py`](manuals/fft_analysis.py) | Spectra: amplitude accuracy, leakage and window choice, dB and SPL, A-weighting, THD and energy bands. → [rendered notebook](../docs/manuals/notebooks/fft-analysis.ipynb) · [manual](../docs/manuals/fft-analysis.md) |
+| [`manuals/transfer_function.py`](manuals/transfer_function.py) | Frequency response of a known resonance, the phase crossing, bias error against resolution, coherence, and the H1 = γ²·H2 identity. → [rendered notebook](../docs/manuals/notebooks/transfer-function.ipynb) · [manual](../docs/manuals/transfer-function.md) |
 
 ### Using one
 

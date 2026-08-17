@@ -187,6 +187,103 @@ def select_signal(window, name: str) -> None:
     raise SystemExit(f"no signal named {name!r} in the window")
 
 
+def tf_window(signals, *, references=(), size=(1220, 780), df=None,
+              window_type=None, **controls):
+    """A Transfer Function window with roles assigned and controls set.
+
+    ``references`` names the signals to mark as Reference; everything else
+    becomes a Response. Assigning by name rather than relying on the
+    window's "first signal becomes the reference" default keeps a shot
+    correct even if read_hdf5's alphabetical order changes.
+    """
+    from spwb.gui.bridge import WindowManager
+    from spwb.gui.tf_analysis import TransferFunctionWindow
+
+    session()
+    window = TransferFunctionWindow(WindowManager())
+    window.resize(*size)
+    for signal in signals:
+        window.store.add(signal)
+
+    names = {s.name for s in window.store}
+    missing = [n for n in references if n not in names]
+    if missing:
+        raise SystemExit(f"no signal named {missing}; window has {sorted(names)}")
+    for signal in window.store:
+        window._roles[signal.sid] = ("Reference" if signal.name in references
+                                     else "Response")
+
+    if df is not None:
+        window.freq_resolution.setValue(df)
+    if window_type is not None:
+        index = window.window_box.findData(window_type)
+        if index < 0:
+            raise SystemExit(f"no window named {window_type!r}")
+        window.window_box.setCurrentIndex(index)
+    for control, value in controls.items():
+        box = getattr(window, control)
+        if box.findText(value) < 0:
+            raise SystemExit(f"{control}: no option {value!r}; has "
+                             f"{[box.itemText(i) for i in range(box.count())]}")
+        box.setCurrentText(value)
+    window.recompute()
+    return window
+
+
+def shot_tf_overview() -> None:
+    """The window as it opens on the SDOF resonance: magnitude, log axes."""
+    window = tf_window(demo("09_TF_SDOF_resonance_H1.h5"),
+                       references=("Input (reference)",),
+                       log_x="Logarithmic", log_y="Logarithmic")
+    session().processEvents()
+    capture(window, "tf_overview")
+    window.close()
+
+
+def shot_tf_phase_crossing() -> None:
+    """Phase passes -90 deg exactly at the natural frequency."""
+    window = tf_window(demo("09_TF_SDOF_resonance_H1.h5"),
+                       references=("Input (reference)",),
+                       display_type="Phase (Degree)")
+    session().processEvents()
+    window.plot.viewbox.setXRange(60.0, 100.0, padding=0)
+    window.plot.viewbox.setYRange(-180.0, 10.0, padding=0)
+    capture(window, "tf_phase_crossing")
+    window.close()
+
+
+def shot_tf_coherence_interference() -> None:
+    """Coherence collapses only where the input did not cause the output."""
+    window = tf_window(
+        demo("10_TF_Coherence_partial.h5"),
+        references=("Input (reference)",),
+        df=2.0, display_type="Coherence")
+    session().processEvents()
+    window.plot.viewbox.setXRange(0.0, 1500.0, padding=0)
+    capture(window, "tf_coherence_interference")
+    window.close()
+
+
+def _estimator_shot(estimator: str, name: str) -> None:
+    """Demo 11 - noise on the input - under one estimator."""
+    window = tf_window(demo("11_TF_H1_vs_H2_input_noise.h5"),
+                       references=("Input, noisy measurement",),
+                       estimator=estimator)
+    session().processEvents()
+    window.plot.viewbox.setXRange(40.0, 130.0, padding=0)
+    window.plot.viewbox.setYRange(0.0, 20.0, padding=0)
+    capture(window, name)
+    window.close()
+
+
+def shot_tf_estimator_h1() -> None:
+    _estimator_shot("H1", "tf_estimator_h1")
+
+
+def shot_tf_estimator_h2() -> None:
+    _estimator_shot("H2", "tf_estimator_h2")
+
+
 def shot_time_processing_attributes() -> None:
     """A selected signal, with the attributes panel stating its answer."""
     window = time_processing(demo("01_TimeProcessing_Stats_known_values.h5"))
@@ -356,6 +453,11 @@ SHOTS = {
     "fft_a_weighting": shot_fft_a_weighting,
     "fft_harmonics": shot_fft_harmonics,
     "fft_energy_band": shot_fft_energy_band,
+    "tf_overview": shot_tf_overview,
+    "tf_phase_crossing": shot_tf_phase_crossing,
+    "tf_coherence_interference": shot_tf_coherence_interference,
+    "tf_estimator_h1": shot_tf_estimator_h1,
+    "tf_estimator_h2": shot_tf_estimator_h2,
     "about_dialog": shot_about_dialog,
 }
 

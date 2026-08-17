@@ -434,9 +434,10 @@ opens them.
 ### User manuals
 
 [`docs/manuals/`](docs/manuals/) holds a manual per analysis window —
-[**Time Processing**](docs/manuals/time-processing.md) and
-[**FFT Analysis**](docs/manuals/fft-analysis.md) so far — each working
-through demonstration datasets whose expected values
+[**Time Processing**](docs/manuals/time-processing.md),
+[**FFT Analysis**](docs/manuals/fft-analysis.md) and
+[**Transfer Function**](docs/manuals/transfer-function.md) so far — each
+working through demonstration datasets whose expected values
 `tools/verify_demo_data.py` checks, so every number a manual quotes is one
 the application demonstrably produces. They are also reachable from inside
 the application, under **Help > User Manuals ...**.
