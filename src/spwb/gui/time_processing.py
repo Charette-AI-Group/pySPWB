@@ -18,6 +18,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtGui import QAction, QKeySequence
 from PySide6.QtWidgets import (
     QAbstractItemView,
+    QApplication,
     QHeaderView,
     QInputDialog,
     QLabel,
@@ -270,6 +271,13 @@ class TimeProcessingWindow(QMainWindow):
         save_menu.addAction(act)
 
         file_menu.addSeparator()
+        # The manuals teach through these datasets, so they have to be
+        # reachable without a git checkout - most users install the wheel.
+        act = QAction("Create Demo Data ...", self)
+        act.triggered.connect(self.create_demo_data)
+        file_menu.addAction(act)
+
+        file_menu.addSeparator()
         act = QAction("Exit", self)
         act.triggered.connect(self.close)
         file_menu.addAction(act)
@@ -518,6 +526,60 @@ class TimeProcessingWindow(QMainWindow):
         self.statusBar().showMessage(
             f"Saved {len(signals)} signal(s) to {written.name} - opens "
             f"directly in Excel and LibreOffice")
+
+    def create_demo_data(self) -> None:
+        """File > Create Demo Data ...: write the tutorial datasets.
+
+        The user manuals in ``docs/manuals/`` work through these files, and
+        most people install the wheel rather than clone the repository - so
+        the datasets have to be obtainable from inside the application, not
+        only from a developer script.
+        """
+        from ..demo import write_demo_data
+
+        folder = settings.choose_folder(
+            self, "Choose a folder for the demonstration datasets", "demo")
+        if not folder:
+            return
+
+        target = Path(folder)
+        existing = sorted(target.glob("[0-9][0-9]_*.h5"))
+        if existing and QMessageBox.question(
+                self, "Create Demo Data",
+                f"{target} already contains {len(existing)} demo file(s).\n\n"
+                "They will be overwritten. Continue?") != QMessageBox.Yes:
+            return
+
+        def report(done: int, total: int, path: Path) -> None:
+            self.statusBar().showMessage(
+                f"Creating demo data - {done} of {total}: {path.name}")
+            QApplication.processEvents()   # ~2 s in total; keep the UI alive
+
+        QApplication.setOverrideCursor(Qt.WaitCursor)
+        try:
+            written = write_demo_data(target, progress=report)
+        except Exception as exc:
+            QMessageBox.critical(
+                self, "Create Demo Data",
+                f"Could not write the demonstration datasets to\n{target}\n\n"
+                f"{exc}")
+            self.statusBar().showMessage("Demo data was not created")
+            return
+        finally:
+            QApplication.restoreOverrideCursor()
+
+        # so the user's next File > Open starts where the data just landed
+        settings.remember_dir("hdf5", "open", target)
+        self.statusBar().showMessage(
+            f"Created {len(written)} demonstration datasets in {target}")
+        QMessageBox.information(
+            self, "Create Demo Data",
+            f"Wrote {len(written)} datasets to\n{target}\n\n"
+            "Every signal carries its expected result in its attributes, so "
+            "you can check the application rather than just look at it. "
+            "README.txt in that folder lists what each file demonstrates, "
+            "and the user manuals work through them one by one.\n\n"
+            "Open them with File > Open > SPWB / HDF5.")
 
     def open_rpc(self) -> None:
         path = settings.open_file(

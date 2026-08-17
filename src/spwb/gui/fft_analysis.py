@@ -143,7 +143,9 @@ class FFTWindow(QMainWindow):
         self.statusBar().showMessage("Ready")
 
     def _build_tabs(self) -> QTabWidget:
-        tabs = QTabWidget()
+        # kept on self, as TimeProcessingWindow does: the manuals' screenshot
+        # script selects a tab by name rather than by position
+        tabs = self.tabs = QTabWidget()
 
         # --- Spectral Analysis ------------------------------------------
         self.freq_resolution = QDoubleSpinBox()
@@ -190,7 +192,7 @@ class FFTWindow(QMainWindow):
         display_form.addRow("Spectrum Display Options:", self.display_option)
         display_form.addRow("Acoustic Weighting:", self.weighting)
 
-        spectral_tab = QWidget()
+        spectral_tab = self.spectral_tab = QWidget()
         spectral_layout = QHBoxLayout(spectral_tab)
         spectral_layout.addWidget(params)
         spectral_layout.addWidget(display, 1)
@@ -227,7 +229,7 @@ class FFTWindow(QMainWindow):
         copy_btn = QPushButton("Export table to clipboard")
         copy_btn.clicked.connect(self.copy_band_table)
 
-        band_tab = QWidget()
+        band_tab = self.band_tab = QWidget()
         band_layout = QVBoxLayout(band_tab)
         band_form = QHBoxLayout()
         band_form.addWidget(QLabel("Start Frequency:"))
@@ -249,7 +251,7 @@ class FFTWindow(QMainWindow):
         self.log_x.currentIndexChanged.connect(self._replot)
         self.log_y.currentIndexChanged.connect(self._apply_graph_options)
 
-        graph_tab = QWidget()
+        graph_tab = self.graph_tab = QWidget()
         graph_form = QFormLayout(graph_tab)
         graph_form.addRow("Frequency axis:", self.log_x)
         graph_form.addRow("Amplitude axis:", self.log_y)

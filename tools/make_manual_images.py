@@ -116,7 +116,16 @@ def time_processing(signals, *, size=(1150, 720)):
     return window
 
 
-def fft_window(signals, *, size=(1200, 760), **controls):
+def fft_window(signals, *, size=(1200, 760), window_type=None, df=None,
+               **controls):
+    """An FFT window with signals loaded and its combo boxes set.
+
+    ``controls`` names combo-box attributes and the text to select, so a
+    shot reads like the sequence of clicks the manual asks for. ``df`` and
+    ``window_type`` are separate because neither is a plain combo box: the
+    resolution is a spin box, and the window list stores its SPWB key as
+    item data while displaying a prettier label.
+    """
     from spwb.gui.bridge import WindowManager
     from spwb.gui.fft_analysis import FFTWindow
 
@@ -125,8 +134,19 @@ def fft_window(signals, *, size=(1200, 760), **controls):
     window.resize(*size)
     for signal in signals:
         window.store.add(signal)
+    if df is not None:
+        window.freq_resolution.setValue(df)
+    if window_type is not None:
+        index = window.window_box.findData(window_type)
+        if index < 0:
+            raise SystemExit(f"no window named {window_type!r}")
+        window.window_box.setCurrentIndex(index)
     for control, value in controls.items():
-        getattr(window, control).setCurrentText(value)
+        box = getattr(window, control)
+        if box.findText(value) < 0:
+            raise SystemExit(f"{control}: no option {value!r}; "
+                             f"has {[box.itemText(i) for i in range(box.count())]}")
+        box.setCurrentText(value)
     window.recompute()
     return window
 
@@ -150,6 +170,15 @@ def shot_time_processing_stats() -> None:
     session().processEvents()
     window.plot.viewbox.setXRange(0.0, 0.06, padding=0)
     capture(window, "time_processing_stats_tab")
+    window.close()
+
+
+def shot_fft_overview() -> None:
+    """The window exactly as it opens: defaults, nothing touched yet."""
+    window = fft_window(demo("04_FFT_Tones_known_amplitudes.h5"))
+    session().processEvents()
+    window.plot.viewbox.setXRange(0.0, 500.0, padding=0)
+    capture(window, "fft_overview")
     window.close()
 
 
@@ -177,6 +206,70 @@ def shot_fft_spl_94db() -> None:
     window.close()
 
 
+def _leakage(window_type: str, name: str) -> None:
+    """One tone on a bin and one half a bin off, under a given window."""
+    window = fft_window(
+        demo("05_FFT_Leakage_window_choice.h5",
+             "Tone on bin 100.0 Hz", "Tone off bin 100.5 Hz"),
+        window_type=window_type,
+        function_type="Auto Spectrum - (EU Peak)")
+    session().processEvents()
+    # tight enough that the two peak heights can be compared by eye
+    window.plot.viewbox.setXRange(96.0, 104.0, padding=0)
+    window.plot.viewbox.setYRange(0.0, 1.1, padding=0)
+    capture(window, name)
+    window.close()
+
+
+def shot_fft_leakage_hanning() -> None:
+    _leakage("hanning", "fft_leakage_hanning")
+
+
+def shot_fft_leakage_flat_top() -> None:
+    _leakage("flat_top", "fft_leakage_flat_top")
+
+
+def shot_fft_a_weighting() -> None:
+    """Ten equal tones become the A-curve once weighting is switched on."""
+    window = fft_window(
+        demo("07_FFT_A_weighting_octave_tones.h5"), df=2.0,
+        window_type="flat_top",
+        function_type="Auto Spectrum - (EU RMS)",
+        display_option="dB - NO reference value",
+        weighting="A-weighting",
+        log_x="Logarithmic")
+    session().processEvents()
+    # the floor between the tones runs to -300 dB and would flatten the curve
+    window.plot.viewbox.setYRange(-60.0, 10.0, padding=0)
+    capture(window, "fft_a_weighting")
+    window.close()
+
+
+def shot_fft_harmonics() -> None:
+    """Harmonics at -20, -26 and -40 dB below a 0 dB fundamental."""
+    window = fft_window(demo("08_FFT_Harmonics_THD.h5"),
+                        function_type="Auto Spectrum - (EU Peak)",
+                        display_option="dB - NO reference value")
+    session().processEvents()
+    window.plot.viewbox.setXRange(0.0, 500.0, padding=0)
+    window.plot.viewbox.setYRange(-60.0, 10.0, padding=0)
+    capture(window, "fft_harmonics")
+    window.close()
+
+
+def shot_fft_energy_band() -> None:
+    """The Energy Band tab summing the harmonics alone, 150-450 Hz."""
+    window = fft_window(demo("08_FFT_Harmonics_THD.h5"),
+                        function_type="Auto Spectrum - (EU Peak)")
+    window.band_start.setValue(150.0)
+    window.band_end.setValue(450.0)
+    window.tabs.setCurrentWidget(window.band_tab)
+    session().processEvents()
+    window.plot.viewbox.setXRange(0.0, 500.0, padding=0)
+    capture(window, "fft_energy_band")
+    window.close()
+
+
 def shot_about_dialog() -> None:
     from spwb.gui.about import AboutDialog
 
@@ -190,8 +283,14 @@ def shot_about_dialog() -> None:
 SHOTS = {
     "time_processing_overview": shot_time_processing_overview,
     "time_processing_stats_tab": shot_time_processing_stats,
+    "fft_overview": shot_fft_overview,
     "fft_known_amplitudes": shot_fft_known_amplitudes,
+    "fft_leakage_hanning": shot_fft_leakage_hanning,
+    "fft_leakage_flat_top": shot_fft_leakage_flat_top,
     "fft_spl_94db": shot_fft_spl_94db,
+    "fft_a_weighting": shot_fft_a_weighting,
+    "fft_harmonics": shot_fft_harmonics,
+    "fft_energy_band": shot_fft_energy_band,
     "about_dialog": shot_about_dialog,
 }
 

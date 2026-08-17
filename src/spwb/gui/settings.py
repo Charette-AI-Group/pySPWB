@@ -64,7 +64,8 @@ __all__ = [
 
 #: file-type slugs, one remembered folder per (kind, mode) pair. Slugs are
 #: stable storage keys - renaming one silently forgets that folder.
-KINDS: tuple[str, ...] = ("hdf5", "tdms", "wave", "text", "rpc", "head_hdf")
+KINDS: tuple[str, ...] = ("hdf5", "tdms", "wave", "text", "rpc", "head_hdf",
+                          "demo")
 
 #: the operations tracked separately for each kind
 MODES: tuple[str, ...] = ("open", "save")
@@ -269,3 +270,12 @@ def save_file(parent: QWidget | None, caption: str, kind: str,
     if path:
         remember_dir(kind, "save", path)
     return path
+
+
+def choose_folder(parent: QWidget | None, caption: str, kind: str) -> str:
+    """``QFileDialog.getExistingDirectory`` that remembers where it was."""
+    folder = QFileDialog.getExistingDirectory(parent, caption,
+                                              last_dir(kind, "save"))
+    if folder:
+        remember_dir(kind, "save", folder)
+    return folder

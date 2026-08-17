@@ -431,6 +431,30 @@ the first time, and explains what to do rather than flashing a console
 window and vanishing if something is missing. Dropping data files onto it
 opens them.
 
+### User manuals
+
+[`docs/manuals/`](docs/manuals/) holds a manual per analysis window —
+starting with [**FFT Analysis**](docs/manuals/fft-analysis.md) — each
+working through demonstration datasets whose expected values
+`tools/verify_demo_data.py` checks, so every number a manual quotes is one
+the application demonstrably produces.
+
+**The demo datasets come with the package, not just the repository.** They
+are synthesised from a fixed seed rather than shipped as files, so every
+copy is identical, and there are three ways to make them: **File > Create
+Demo Data ...** in the application, `from spwb.demo import write_demo_data`
+in a script, or `python tools/make_demo_data.py` from a checkout. A reader
+who installed the wheel can follow every manual example. (Screenshots are
+regenerated with `python tools/make_manual_images.py`.)
+
+Every manual has a **companion notebook** working the same examples in
+code — [FFT Analysis — worked
+examples](docs/manuals/notebooks/fft-analysis.ipynb), rendered by GitHub
+with its graphs — so the same material serves both the person clicking
+through the application and the person scripting it. Their sources live in
+[`examples/manuals/`](examples/manuals/) and each section asserts the
+numbers its manual quotes, which `tests/test_examples.py` runs.
+
 ### The graph palette
 
 Every plot carries the tool palette SPWB's LabVIEW front panels had: pick a
