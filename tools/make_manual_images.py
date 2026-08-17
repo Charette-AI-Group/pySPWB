@@ -46,7 +46,7 @@ DATA_DIR = REPO / ".data"
 DOCS_DIR = REPO / "docs" / "manuals" / "images"
 REVIEW_DIR = REPO / ".screenshots"
 
-from PySide6.QtCore import QSettings
+from PySide6.QtCore import QSettings, Qt
 from PySide6.QtWidgets import QApplication
 
 _app: QApplication | None = None
@@ -173,6 +173,68 @@ def shot_time_processing_stats() -> None:
     window.close()
 
 
+def select_signal(window, name: str) -> None:
+    """Select a signal in the list by name, as a click on its row would.
+
+    By name rather than by row: read_hdf5 returns signals in the file's own
+    alphabetical order, so a row index quietly selects a different one.
+    """
+    for i in range(window.tree.topLevelItemCount()):
+        item = window.tree.topLevelItem(i)
+        if item.data(0, Qt.UserRole).name == name:
+            window.tree.setCurrentItem(item)
+            return
+    raise SystemExit(f"no signal named {name!r} in the window")
+
+
+def shot_time_processing_attributes() -> None:
+    """A selected signal, with the attributes panel stating its answer."""
+    window = time_processing(demo("01_TimeProcessing_Stats_known_values.h5"))
+    session().processEvents()
+    select_signal(window, "Sine 1 Vpk")
+    session().processEvents()
+    window.plot.viewbox.setXRange(0.0, 0.06, padding=0)
+    capture(window, "time_processing_attributes")
+    window.close()
+
+
+def shot_time_processing_scale_tab() -> None:
+    """The Scale Signals tab with a 100 mV/g calibration staged."""
+    window = time_processing(
+        demo("03_TimeProcessing_Calibration_raw_volts.h5"))
+    window.tabs.setCurrentWidget(window.scale_tab)
+    session().processEvents()
+
+    # stage what the manual asks for, without pressing Apply: the point of
+    # the shot is the edited row, and the tab stages rather than applying
+    table = window.scale_tab.table
+    for row in range(table.rowCount()):
+        if table.item(row, 0).text() == "Accel raw":
+            table.item(row, 1).setText("g")       # Unit
+            table.item(row, 2).setText("10")      # Calib Factor = 1 / 0.100
+            break
+    else:
+        raise SystemExit("no 'Accel raw' row in the Scale Signals table")
+
+    session().processEvents()
+    window.plot.viewbox.setXRange(0.0, 0.2, padding=0)
+    capture(window, "time_processing_scale_tab")
+    window.close()
+
+
+def shot_time_processing_tvm_tab() -> None:
+    """The peak trend of the four bursts: a staircase over the data."""
+    window = time_processing(demo("02_TimeProcessing_TVmetrics_trends.h5",
+                                  "Four bursts 0.25 to 1.0"))
+    window.tabs.setCurrentWidget(window.tvm_tab)
+    window.tvm_tab.trend.setCurrentText("Absolute Peak")
+    session().processEvents()
+    window.tvm_tab.compute()          # adds the trend to the window
+    session().processEvents()
+    capture(window, "time_processing_tvm_tab")
+    window.close()
+
+
 def shot_fft_overview() -> None:
     """The window exactly as it opens: defaults, nothing touched yet."""
     window = fft_window(demo("04_FFT_Tones_known_amplitudes.h5"))
@@ -282,7 +344,10 @@ def shot_about_dialog() -> None:
 
 SHOTS = {
     "time_processing_overview": shot_time_processing_overview,
+    "time_processing_attributes": shot_time_processing_attributes,
     "time_processing_stats_tab": shot_time_processing_stats,
+    "time_processing_scale_tab": shot_time_processing_scale_tab,
+    "time_processing_tvm_tab": shot_time_processing_tvm_tab,
     "fft_overview": shot_fft_overview,
     "fft_known_amplitudes": shot_fft_known_amplitudes,
     "fft_leakage_hanning": shot_fft_leakage_hanning,

@@ -2,7 +2,8 @@
 
 The hub window of SPWB: loads and saves time signals, and hands them to the
 analysis tools. Menu structure follows the original runtime menu
-(``TDP.rtm``): File / Signals / Window / About.
+(``TDP.rtm``): File / Signals / Window / Help - the original's "About"
+menu, renamed once it had the user manuals to offer as well.
 
 Compared with the LabVIEW original this window is deliberately thinner - the
 analysis tabs (Scale, Stats, TV Metrics, Signal Processing) are still to be
@@ -14,8 +15,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from PySide6.QtCore import Qt
-from PySide6.QtGui import QAction, QKeySequence
+from PySide6.QtCore import Qt, QUrl
+from PySide6.QtGui import QAction, QDesktopServices, QKeySequence
 from PySide6.QtWidgets import (
     QAbstractItemView,
     QApplication,
@@ -34,6 +35,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from .. import app_config
 from ..processing.model.signal import Signal
 from ..processing.model.store import SignalStore
 from . import about, settings
@@ -333,10 +335,18 @@ class TimeProcessingWindow(QMainWindow):
         act.triggered.connect(self.duplicate_window)
         window_menu.addAction(act)
 
-        about_menu = bar.addMenu("&About")
+        # "Help" rather than the original's "About": the manuals are the
+        # first thing a new user needs, and nobody looks under About for
+        # documentation. About SPWB keeps its place directly underneath.
+        help_menu = bar.addMenu("&Help")
+        act = QAction("User Manuals ...", self)
+        act.setShortcut(QKeySequence.HelpContents)
+        act.triggered.connect(self.open_manuals)
+        help_menu.addAction(act)
+        help_menu.addSeparator()
         act = QAction("About SPWB", self)
         act.triggered.connect(self.show_about)
-        about_menu.addAction(act)
+        help_menu.addAction(act)
 
     # -- list / plot ---------------------------------------------------------
     def _refresh_list(self) -> None:
@@ -846,6 +856,22 @@ class TimeProcessingWindow(QMainWindow):
             window.store.add(sig.copy())
         window.show()
         return window
+
+    def open_manuals(self) -> None:
+        """Help > User Manuals ...: the manuals, rendered, in a browser.
+
+        The online copy rather than any local one - GitHub renders the
+        markdown and the companion notebooks, while a checkout's .md would
+        open in a text editor and a wheel install has no copy at all.
+        """
+        if QDesktopServices.openUrl(QUrl(app_config.MANUALS_URL)):
+            self.statusBar().showMessage(
+                "The user manuals are opening in your browser.")
+        else:
+            QMessageBox.information(
+                self, "User Manuals",
+                "Could not open a browser. The manuals are at:\n\n"
+                f"{app_config.MANUALS_URL}")
 
     def show_about(self) -> None:
         if about.show_about(self):

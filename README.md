@@ -434,10 +434,12 @@ opens them.
 ### User manuals
 
 [`docs/manuals/`](docs/manuals/) holds a manual per analysis window —
-starting with [**FFT Analysis**](docs/manuals/fft-analysis.md) — each
-working through demonstration datasets whose expected values
+[**Time Processing**](docs/manuals/time-processing.md) and
+[**FFT Analysis**](docs/manuals/fft-analysis.md) so far — each working
+through demonstration datasets whose expected values
 `tools/verify_demo_data.py` checks, so every number a manual quotes is one
-the application demonstrably produces.
+the application demonstrably produces. They are also reachable from inside
+the application, under **Help > User Manuals ...**.
 
 **The demo datasets come with the package, not just the repository.** They
 are synthesised from a fixed seed rather than shipped as files, so every

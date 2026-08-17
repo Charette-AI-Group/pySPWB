@@ -37,6 +37,7 @@ __all__ = [
     "EDITOR",
     "ICON_FILE",
     "LABVIEW_REPO_URL",
+    "MANUALS_URL",
     "ORGANIZATION_NAME",
     "REPO_URL",
     "RESOURCES_DIR",
@@ -63,6 +64,11 @@ COPYRIGHT_HOLDER = "Charette AI Group, LLC"
 DONATE_URL = "https://www.paypal.com/donate/?hosted_button_id=FEM4WLD7LHY36"
 REPO_URL = "https://github.com/Charette-AI-Group/pySPWB"
 LABVIEW_REPO_URL = "https://github.com/Charette-AI-Group/SPWB"
+#: the user manuals, one per analysis window. Deliberately the GitHub URL
+#: and not a copy inside the checkout: GitHub renders the markdown and the
+#: companion notebooks, a local .md would open in a text editor, and most
+#: users install the wheel and have no local copy at all.
+MANUALS_URL = f"{REPO_URL}/tree/main/docs/manuals"
 
 # -- brand colours ---------------------------------------------------------
 # Dark text on yellow, matching CloakClip and the SAE Calculator so the

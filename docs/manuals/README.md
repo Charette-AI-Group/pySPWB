@@ -7,8 +7,8 @@ application actually produces — not one derived on paper and hoped for.
 
 | Manual | Window | Demo files | Companion notebook |
 |---|---|---|---|
+| [Time Processing](time-processing.md) | The hub: files, statistics, calibration, trends | 01–03 | [notebook](notebooks/time-processing.ipynb) |
 | [FFT Analysis](fft-analysis.md) | Spectra, windows, dB, weighting, energy bands | 04–08 | [notebook](notebooks/fft-analysis.ipynb) |
-| Time Processing | *(to be written)* | 01–03 | |
 | Transfer Function | *(to be written)* | 09–11 | |
 | Time-Frequency Analysis | *(to be written)* | 12–13 | |
 | Adaptive Filtering (LMS) | *(to be written)* | 14 | |
