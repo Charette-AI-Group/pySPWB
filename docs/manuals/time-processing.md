@@ -185,6 +185,15 @@ rectangle, **Zoom X** and **Zoom Y** — and only one is active at a time.
 The four below are one-shot buttons: zoom in, zoom out, **fit to all
 data**, and undo the last zoom.
 
+**To set an exact limit, double-click the first or last number on an axis**
+and type the one you want. That is the LabVIEW gesture, and it is the only
+way to get an exact edge with the mouse — every drag tool lands somewhere
+approximate. A value that would put the minimum above the maximum is
+refused and the old one stays, but limits *beyond the data* are allowed
+deliberately, so you can leave headroom around a signal. On a logarithmic
+axis you type the real frequency, not its logarithm. Setting a limit turns
+off autoscale for that axis; **fit to all data** turns it back on.
+
 ### Scale Signals tab
 
 Per-signal **Unit**, **Calib Factor** and **DC Offset**, plus the signal's

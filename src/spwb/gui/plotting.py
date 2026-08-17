@@ -30,6 +30,7 @@ badly, and that is what the menu is good at.
 """
 from __future__ import annotations
 
+import math
 from collections.abc import Callable
 
 import pyqtgraph as pg
@@ -38,14 +39,25 @@ from PySide6.QtGui import QColor, QIcon, QPainter, QPalette, QPen, QPixmap
 from PySide6.QtWidgets import (
     QButtonGroup,
     QHBoxLayout,
+    QInputDialog,
     QSizePolicy,
     QToolButton,
     QVBoxLayout,
     QWidget,
 )
 
-__all__ = ["CURVE_WIDTH", "GRID_ALPHA", "LEGEND_OPACITY", "PEN_COLOURS",
-           "TOOLS", "GraphViewBox", "SpwbPlot", "curve_pen"]
+__all__ = [
+    "CURVE_WIDTH",
+    "GRID_ALPHA",
+    "LEGEND_OPACITY",
+    "PEN_COLOURS",
+    "TOOLS",
+    "EditableAxis",
+    "GraphViewBox",
+    "SpwbPlot",
+    "curve_pen",
+    "limit_end_at",
+]
 
 # Antialiasing is off, deliberately, and it is not a cosmetic preference.
 # Qt's raster engine has a fast path for 1px cosmetic pens; any wider pen
@@ -272,6 +284,123 @@ def _glyphs(colour: QColor) -> dict[str, QIcon]:
         ("undo", undo))}
 
 
+def limit_end_at(text_specs, pos, horizontal: bool) -> str | None:
+    """Which axis limit the point ``pos`` is on: "min", "max" or neither.
+
+    ``text_specs`` are the ``(rect, flags, text)`` triples pyqtgraph builds
+    for the tick labels. Only the two extreme labels count, because those
+    are the ones that *are* the axis limits - LabVIEW let you edit the first
+    and last tick and nothing between them.
+
+    Kept a plain function so the geometry can be tested without a rendered
+    widget, a mouse event or a dialog.
+    """
+    if len(text_specs) < 2:
+        return None                     # one tick: which end is ambiguous
+    centre = ((lambda rect: rect.center().x()) if horizontal
+              else (lambda rect: rect.center().y()))
+    ordered = sorted(text_specs, key=lambda spec: centre(spec[0]))
+    first, last = ordered[0], ordered[-1]
+
+    for spec, at_start in ((first, True), (last, False)):
+        if spec[0].contains(pos):
+            if horizontal:
+                return "min" if at_start else "max"
+            # screen y grows downwards, so the topmost label is the largest
+            return "max" if at_start else "min"
+    return None
+
+
+class EditableAxis(pg.AxisItem):
+    """An axis whose first and last tick labels can be double-clicked.
+
+    The LabVIEW panels let you double-click either end tick of a graph and
+    type a new limit; anything invalid reverted to what was there. This is
+    that, and it is the only way to set an exact limit with the mouse - the
+    drag tools always land somewhere approximate.
+
+    Out-of-order values are refused (a minimum cannot sit above the
+    maximum), but limits *beyond the data* are allowed on purpose: leaving
+    headroom around a signal is a normal thing to want, and clamping to the
+    data would make it impossible.
+    """
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self._text_specs: list = []
+
+    # pyqtgraph computes the tick-label rectangles inside paint and throws
+    # them away; catching them here is what makes hit-testing the real
+    # labels possible, rather than guessing from a fraction of the width.
+    def drawPicture(self, painter, axisSpec, tickSpecs, textSpecs) -> None:
+        self._text_specs = list(textSpecs)
+        super().drawPicture(painter, axisSpec, tickSpecs, textSpecs)
+
+    @property
+    def horizontal(self) -> bool:
+        return self.orientation in ("bottom", "top")
+
+    def current_limits(self) -> tuple[float, float] | None:
+        """The axis range in the units shown, undoing log mode."""
+        view = self.linkedView()
+        if view is None:
+            return None
+        low, high = view.viewRange()[0 if self.horizontal else 1]
+        if self.logMode:
+            # pyqtgraph holds a log axis's range as log10, so a plot showing
+            # 100 Hz reports 2.0. Everything the user sees or types is the
+            # real number; the conversion belongs here and nowhere else.
+            return 10.0 ** low, 10.0 ** high
+        return low, high
+
+    def set_limit(self, end: str, value: float) -> bool:
+        """Move one limit. Returns False - changing nothing - if invalid."""
+        limits = self.current_limits()
+        if limits is None or end not in ("min", "max"):
+            return False
+        low, high = limits
+        if not math.isfinite(value):
+            return False
+        if self.logMode and value <= 0:
+            return False                # log10 of zero or less does not exist
+        if (value >= high if end == "min" else value <= low):
+            return False                # would invert or collapse the axis
+
+        low, high = (value, high) if end == "min" else (low, value)
+        if self.logMode:
+            low, high = math.log10(low), math.log10(high)
+        view = self.linkedView()
+        if self.horizontal:
+            view.setXRange(low, high, padding=0)
+        else:
+            view.setYRange(low, high, padding=0)
+        return True
+
+    def mouseDoubleClickEvent(self, event) -> None:
+        end = limit_end_at(self._text_specs, event.pos(), self.horizontal)
+        limits = self.current_limits()
+        if end is None or limits is None:
+            super().mouseDoubleClickEvent(event)
+            return
+
+        event.accept()
+        current = limits[0 if end == "min" else 1]
+        label = "Minimum" if end == "min" else "Maximum"
+        axis = "X" if self.horizontal else "Y"
+        # free text rather than a spin box: it accepts 1e-3 and does not
+        # round a limit to however many decimals a spin box was given
+        text, ok = QInputDialog.getText(
+            self.getViewWidget(), f"{axis} axis {label.lower()}",
+            f"{label} of the {axis} axis:", text=f"{current:g}")
+        if not ok:
+            return
+        try:
+            value = float(text)
+        except ValueError:
+            return                      # as LabVIEW did: keep what was there
+        self.set_limit(end, value)
+
+
 class SpwbPlot(QWidget):
     """A themed pyqtgraph plot with SPWB's graph palette beside it.
 
@@ -293,7 +422,12 @@ class SpwbPlot(QWidget):
         self._fg = colours.color(QPalette.WindowText)
 
         self.viewbox = GraphViewBox()
-        self.plot_widget = pg.PlotWidget(viewBox=self.viewbox)
+        # EditableAxis on both: double-clicking an end tick label sets
+        # that limit exactly, which no drag tool can do
+        self.plot_widget = pg.PlotWidget(
+            viewBox=self.viewbox,
+            axisItems={"bottom": EditableAxis("bottom"),
+                       "left": EditableAxis("left")})
         self.plot_widget.setBackground(self._bg)
         for axis in ("bottom", "left"):
             self.plot_widget.getAxis(axis).setPen(self._fg)
