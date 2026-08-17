@@ -18,6 +18,10 @@ classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: MIT License",
+    # Pure Python: one py3-none-any wheel serves Windows, macOS and Linux,
+    # and the CI matrix runs the GUI on all three. Saying so on the project
+    # page matters to the people deciding whether it will run on their Mac.
+    "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Topic :: Scientific/Engineering",
 ]
