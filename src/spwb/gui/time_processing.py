@@ -37,7 +37,7 @@ from PySide6.QtWidgets import (
 
 from ..processing.model.signal import Signal
 from ..processing.model.store import SignalStore
-from . import about, settings
+from . import about, icons, settings
 from .analysis_tabs import ScaleSignalsTab, StatsTab, TVMetricsTab
 from .bridge import StoreBridge, WindowManager
 from .dialogs import ChannelSelectDialog, CreateSignalDialog, ImportFromWindowDialog
@@ -68,6 +68,7 @@ class TimeProcessingWindow(QMainWindow):
         self.bridge = StoreBridge(store)
         self.window_name = manager.register(self)
         self.setWindowTitle(f"SPWB - Time Data Processing  [{self.window_name}]")
+        icons.apply_window_icon(self, "tdp")
         self.resize(1100, 700)
 
         self._build_ui()

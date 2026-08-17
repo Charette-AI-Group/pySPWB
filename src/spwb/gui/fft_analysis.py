@@ -39,7 +39,7 @@ from ..processing.dsp import spectral as S
 from ..processing.dsp.windows import WINDOW_NAMES
 from ..processing.model.signal import Signal
 from ..processing.model.store import SignalStore
-from . import about, settings
+from . import about, icons, settings
 from .bridge import StoreBridge, WindowManager
 from .dialogs import ImportFromWindowDialog
 from .plotting import PEN_COLOURS, SpwbPlot, curve_pen
@@ -71,6 +71,7 @@ class FFTWindow(QMainWindow):
         self.bridge = StoreBridge(store)          # holds the *time* signals
         self.window_name = manager.register(self)
         self.setWindowTitle(f"SPWB - FFT Analysis  [{self.window_name}]")
+        icons.apply_window_icon(self, "fft")
         self.resize(1150, 720)
 
         self._spectra: dict[int, Signal] = {}     # sid -> displayed spectrum

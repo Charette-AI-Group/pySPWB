@@ -30,7 +30,7 @@ from PySide6.QtWidgets import (
 
 from ..processing.dsp import adaptive as A
 from ..processing.model.store import SignalStore
-from . import about, settings
+from . import about, icons, settings
 from .bridge import StoreBridge, WindowManager
 from .dialogs import ImportFromWindowDialog
 from .plotting import SpwbPlot, curve_pen
@@ -46,6 +46,7 @@ class LMSWindow(QMainWindow):
         self.bridge = StoreBridge(store)
         self.window_name = manager.register(self)
         self.setWindowTitle(f"SPWB - Adaptive Filtering  [{self.window_name}]")
+        icons.apply_window_icon(self, "lms")
         self.resize(1180, 800)
 
         self._result: A.LMSResult | None = None

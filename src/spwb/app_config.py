@@ -127,3 +127,24 @@ APP_DATA_DIR = _app_data_base() / APP_NAME
 def icon_file() -> Path | None:
     """The application icon, or ``None`` if it has not been added yet."""
     return ICON_FILE if ICON_FILE.is_file() else None
+
+
+#: One icon per window type, keyed the way the windows name themselves.
+#: The artwork says what the window shows - a waveform, a spectrum, a
+#: resonance, a spectrogram, noise resolving into a tone - so a taskbar
+#: full of SPWB windows can be read at a glance.
+WINDOW_ICONS: tuple[str, ...] = ("tdp", "fft", "tf", "tfa", "lms")
+
+
+def window_icon_file(key: str) -> Path | None:
+    """The icon for one window type, or ``None`` if it is not there.
+
+    A multi-size ``.ico`` on every platform, including macOS: Qt reads the
+    format everywhere, and one file per window keeps the 16 px drawing -
+    which is drawn, not shrunk - together with the large one.
+    """
+    if key not in WINDOW_ICONS:
+        raise ValueError(f"unknown window icon {key!r}; "
+                         f"expected one of {WINDOW_ICONS}")
+    path = RESOURCES_DIR / f"window-{key}.ico"
+    return path if path.is_file() else None

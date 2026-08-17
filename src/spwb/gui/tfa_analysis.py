@@ -31,7 +31,7 @@ from ..processing.dsp import timefreq as TF
 from ..processing.dsp.windows import WINDOW_NAMES
 from ..processing.model.signal import Signal
 from ..processing.model.store import SignalStore
-from . import about, settings
+from . import about, icons, settings
 from .bridge import StoreBridge, WindowManager
 from .dialogs import ImportFromWindowDialog
 from .fft_analysis import _WINDOW_LABELS
@@ -57,6 +57,7 @@ class TimeFrequencyWindow(QMainWindow):
         self.window_name = manager.register(self)
         self.setWindowTitle(f"SPWB - Time Frequency Analysis  "
                             f"[{self.window_name}]")
+        icons.apply_window_icon(self, "tfa")
         self.resize(1240, 800)
 
         self._spectrogram: TF.Spectrogram | None = None

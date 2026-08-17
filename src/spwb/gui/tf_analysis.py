@@ -39,7 +39,7 @@ from ..processing.dsp import transfer as T
 from ..processing.dsp.windows import WINDOW_NAMES
 from ..processing.model.signal import Signal
 from ..processing.model.store import SignalStore
-from . import about, settings
+from . import about, icons, settings
 from .bridge import StoreBridge, WindowManager
 from .dialogs import ImportFromWindowDialog
 from .fft_analysis import _WINDOW_LABELS
@@ -58,6 +58,7 @@ class TransferFunctionWindow(QMainWindow):
         self.bridge = StoreBridge(store)
         self.window_name = manager.register(self)
         self.setWindowTitle(f"SPWB - Transfer Functions  [{self.window_name}]")
+        icons.apply_window_icon(self, "tf")
         self.resize(1180, 760)
 
         self._roles: dict[int, str] = {}          # sid -> role
