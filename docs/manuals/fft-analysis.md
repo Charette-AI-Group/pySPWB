@@ -239,6 +239,14 @@ Reports the number of spectra in the window and its name (`FFT 00`). It is
 also where two warnings appear: that a requested resolution was not
 achievable, and that a signal could not be transformed at all.
 
+### Menus
+
+| Menu | Contents |
+|---|---|
+| **Signals** | Import Signals ... > Another Window (`Ctrl+I`), Export spectra to clipboard, Exit |
+| **Window** | New FFT Window (`Ctrl+N`), Duplicate Current Window |
+| **Help** | **User Manuals ...** (`F1`), About SPWB |
+
 ---
 
 ## Worked example 1 — amplitudes you can trust

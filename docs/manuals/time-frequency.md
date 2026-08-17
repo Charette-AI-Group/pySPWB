@@ -173,6 +173,14 @@ frequency's level over the whole record.
 Frames × bins, and the resolution actually achieved on both axes. Worth
 reading every time you change the block size.
 
+### Menus
+
+| Menu | Contents |
+|---|---|
+| **Signals** | Import Signals ... > Another Window (`Ctrl+I`), Export sections to clipboard, Exit |
+| **Window** | New TFA Window (`Ctrl+N`) |
+| **Help** | **User Manuals ...** (`F1`), About SPWB |
+
 ---
 
 ## Worked example 1 — a sweep is a diagonal

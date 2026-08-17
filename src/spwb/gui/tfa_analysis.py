@@ -31,7 +31,7 @@ from ..processing.dsp import timefreq as TF
 from ..processing.dsp.windows import WINDOW_NAMES
 from ..processing.model.signal import Signal
 from ..processing.model.store import SignalStore
-from . import settings
+from . import about, settings
 from .bridge import StoreBridge, WindowManager
 from .dialogs import ImportFromWindowDialog
 from .fft_analysis import _WINDOW_LABELS
@@ -236,6 +236,9 @@ class TimeFrequencyWindow(QMainWindow):
         act.setShortcut("Ctrl+N")
         act.triggered.connect(lambda: TimeFrequencyWindow(self.manager).show())
         window_menu.addAction(act)
+
+        # the same Help menu the hub window carries: manuals, then About
+        about.add_help_menu(self)
 
     # -- data ----------------------------------------------------------------
     def _on_store_changed(self) -> None:

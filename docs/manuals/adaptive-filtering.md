@@ -191,6 +191,14 @@ Convergence: 0.0331 (chance level 0.0793) - converged.
 **Add Result to Window** keeps the cleaned signal, so you can send it to an
 FFT window or save it. Until you press it, the run is only on screen.
 
+### Menus
+
+| Menu | Contents |
+|---|---|
+| **Signals** | Import Signals ... > Another Window (`Ctrl+I`), Exit |
+| **Window** | New Adaptive Filtering Window (`Ctrl+N`) |
+| **Help** | **User Manuals ...** (`F1`), About SPWB |
+
 ---
 
 ## Worked example 1 — rescuing a buried tone

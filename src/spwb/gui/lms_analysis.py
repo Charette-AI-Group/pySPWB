@@ -30,7 +30,7 @@ from PySide6.QtWidgets import (
 
 from ..processing.dsp import adaptive as A
 from ..processing.model.store import SignalStore
-from . import settings
+from . import about, settings
 from .bridge import StoreBridge, WindowManager
 from .dialogs import ImportFromWindowDialog
 from .plotting import SpwbPlot, curve_pen
@@ -199,6 +199,9 @@ class LMSWindow(QMainWindow):
         act.setShortcut("Ctrl+N")
         act.triggered.connect(lambda: LMSWindow(self.manager).show())
         window_menu.addAction(act)
+
+        # the same Help menu the hub window carries: manuals, then About
+        about.add_help_menu(self)
 
     # -- data ----------------------------------------------------------------
     def _refresh_selectors(self) -> None:

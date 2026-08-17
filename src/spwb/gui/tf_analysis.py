@@ -39,7 +39,7 @@ from ..processing.dsp import transfer as T
 from ..processing.dsp.windows import WINDOW_NAMES
 from ..processing.model.signal import Signal
 from ..processing.model.store import SignalStore
-from . import settings
+from . import about, settings
 from .bridge import StoreBridge, WindowManager
 from .dialogs import ImportFromWindowDialog
 from .fft_analysis import _WINDOW_LABELS
@@ -265,6 +265,9 @@ class TransferFunctionWindow(QMainWindow):
         act.setShortcut("Ctrl+N")
         act.triggered.connect(lambda: TransferFunctionWindow(self.manager).show())
         window_menu.addAction(act)
+
+        # the same Help menu the hub window carries: manuals, then About
+        about.add_help_menu(self)
 
     # -- roles ---------------------------------------------------------------
     def _set_role(self, role: str) -> None:

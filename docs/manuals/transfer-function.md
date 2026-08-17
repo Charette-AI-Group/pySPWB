@@ -185,6 +185,14 @@ quickest way to ask "is my measurement any good in the band I care about?"
 Bode plot is log-log; the Coherence display ignores the log-amplitude
 setting, since coherence is a fraction between 0 and 1.
 
+### Menus
+
+| Menu | Contents |
+|---|---|
+| **Signals** | Import Signals ... > Another Window (`Ctrl+I`), Export results to clipboard, Exit |
+| **Window** | New TF Window (`Ctrl+N`) |
+| **Help** | **User Manuals ...** (`F1`), About SPWB |
+
 ---
 
 ## Worked example 1 — a resonance you already know the answer to

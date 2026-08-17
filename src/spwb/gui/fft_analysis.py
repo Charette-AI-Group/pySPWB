@@ -39,7 +39,7 @@ from ..processing.dsp import spectral as S
 from ..processing.dsp.windows import WINDOW_NAMES
 from ..processing.model.signal import Signal
 from ..processing.model.store import SignalStore
-from . import settings
+from . import about, settings
 from .bridge import StoreBridge, WindowManager
 from .dialogs import ImportFromWindowDialog
 from .plotting import PEN_COLOURS, SpwbPlot, curve_pen
@@ -283,6 +283,9 @@ class FFTWindow(QMainWindow):
         act = QAction("Duplicate Current Window", self)
         act.triggered.connect(self.duplicate_window)
         window_menu.addAction(act)
+
+        # the same Help menu the hub window carries: manuals, then About
+        about.add_help_menu(self)
 
     # -- parameters ----------------------------------------------------------
     @property

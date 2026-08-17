@@ -15,8 +15,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from PySide6.QtCore import Qt, QUrl
-from PySide6.QtGui import QAction, QDesktopServices, QKeySequence
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QAction, QKeySequence
 from PySide6.QtWidgets import (
     QAbstractItemView,
     QApplication,
@@ -35,7 +35,6 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from .. import app_config
 from ..processing.model.signal import Signal
 from ..processing.model.store import SignalStore
 from . import about, settings
@@ -337,16 +336,8 @@ class TimeProcessingWindow(QMainWindow):
 
         # "Help" rather than the original's "About": the manuals are the
         # first thing a new user needs, and nobody looks under About for
-        # documentation. About SPWB keeps its place directly underneath.
-        help_menu = bar.addMenu("&Help")
-        act = QAction("User Manuals ...", self)
-        act.setShortcut(QKeySequence.HelpContents)
-        act.triggered.connect(self.open_manuals)
-        help_menu.addAction(act)
-        help_menu.addSeparator()
-        act = QAction("About SPWB", self)
-        act.triggered.connect(self.show_about)
-        help_menu.addAction(act)
+        # documentation. Every analysis window carries the same menu.
+        about.add_help_menu(self)
 
     # -- list / plot ---------------------------------------------------------
     def _refresh_list(self) -> None:
@@ -857,23 +848,9 @@ class TimeProcessingWindow(QMainWindow):
         window.show()
         return window
 
-    def open_manuals(self) -> None:
-        """Help > User Manuals ...: the manuals, rendered, in a browser.
-
-        The online copy rather than any local one - GitHub renders the
-        markdown and the companion notebooks, while a checkout's .md would
-        open in a text editor and a wheel install has no copy at all.
-        """
-        if QDesktopServices.openUrl(QUrl(app_config.MANUALS_URL)):
-            self.statusBar().showMessage(
-                "The user manuals are opening in your browser.")
-        else:
-            QMessageBox.information(
-                self, "User Manuals",
-                "Could not open a browser. The manuals are at:\n\n"
-                f"{app_config.MANUALS_URL}")
-
     def show_about(self) -> None:
+        """Kept as a method: the Help menu builds its own handler, but the
+        About dialog is also reachable from code and from the tests."""
         if about.show_about(self):
             self.statusBar().showMessage(
                 "Thank you - the donation page is opening in your browser.")

@@ -15,11 +15,13 @@ from __future__ import annotations
 import datetime
 
 from PySide6.QtCore import Qt, QUrl
-from PySide6.QtGui import QDesktopServices
+from PySide6.QtGui import QAction, QDesktopServices, QKeySequence
 from PySide6.QtWidgets import (
     QDialog,
     QHBoxLayout,
     QLabel,
+    QMenu,
+    QMessageBox,
     QPushButton,
     QVBoxLayout,
     QWidget,
@@ -27,7 +29,8 @@ from PySide6.QtWidgets import (
 
 from .. import app_config
 
-__all__ = ["AboutDialog", "about_html", "show_about"]
+__all__ = ["AboutDialog", "about_html", "add_help_menu", "open_manuals",
+           "show_about"]
 
 #: re-exported so callers need not reach past this module for the one URL
 #: they care about
@@ -124,3 +127,58 @@ def show_about(parent: QWidget | None = None) -> bool:
         QDesktopServices.openUrl(QUrl(app_config.DONATE_URL))
         return True
     return False
+
+
+def open_manuals(parent: QWidget | None = None) -> bool:
+    """Open the user manuals in a browser; return whether one opened.
+
+    The online copy rather than any local one - GitHub renders the markdown
+    and the companion notebooks, while a checkout's .md would open in a text
+    editor and a wheel install has no copy at all. If no browser can be
+    launched the address is shown instead, because leaving the user with
+    nothing is worse than making them copy a URL.
+    """
+    if QDesktopServices.openUrl(QUrl(app_config.MANUALS_URL)):
+        return True
+    QMessageBox.information(
+        parent, "User Manuals",
+        "Could not open a browser. The manuals are at:\n\n"
+        f"{app_config.MANUALS_URL}")
+    return False
+
+
+def _report(window: QWidget, message: str) -> None:
+    """Say something in the window's status bar, if it has one."""
+    status_bar = getattr(window, "statusBar", None)
+    if callable(status_bar):
+        status_bar().showMessage(message)
+
+
+def add_help_menu(window: QWidget) -> QMenu:
+    """Add the Help menu every SPWB window carries, and return it.
+
+    Manuals first, About underneath: the manuals are what a new user needs,
+    and nobody looks under About for documentation. Built here rather than
+    in each window so the five windows cannot drift apart - they were
+    written at different times and it would be easy to fix one and forget
+    the rest.
+    """
+    def manuals() -> None:
+        if open_manuals(window):
+            _report(window, "The user manuals are opening in your browser.")
+
+    def about() -> None:
+        if show_about(window):
+            _report(window,
+                    "Thank you - the donation page is opening in your browser.")
+
+    menu = window.menuBar().addMenu("&Help")
+    action = QAction("User Manuals ...", window)
+    action.setShortcut(QKeySequence.HelpContents)      # F1
+    action.triggered.connect(manuals)
+    menu.addAction(action)
+    menu.addSeparator()
+    action = QAction("About SPWB", window)
+    action.triggered.connect(about)
+    menu.addAction(action)
+    return menu
