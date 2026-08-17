@@ -497,3 +497,18 @@ survives being printed in greyscale.
 | `13_TFA_Tone_bursts.h5` | Overlapping bursts; the cursor and both sections; scalloping on the bin grid |
 
 Confirm every value in this manual with `python tools/verify_demo_data.py`.
+
+---
+
+## Support This Work
+
+If anything here was useful to you, please consider contributing.
+SPWB is free and open source, and always will be — donations are
+what let Charette AI Group keep maintaining it and open-sourcing
+its other tools.
+
+<p align="center">
+  <a href="https://www.paypal.com/donate/?hosted_button_id=FEM4WLD7LHY36">
+      <img src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" alt="Donate with PayPal">
+  </a>
+</p>

@@ -404,3 +404,19 @@ print(f"section 3 OK - 400 Hz reads {section.y[j400]:.2f} dB on the grid, "
 # would do to an image — thresholding, ridge tracking, summing bands — works
 # on it directly. `ridge()` at the top of this notebook is four words of
 # NumPy and it tracked the sweep to within half a bin.
+
+# %% [markdown]
+# ---
+#
+# ## Support This Work
+#
+# If anything here was useful to you, please consider contributing.
+# SPWB is free and open source, and always will be — donations are
+# what let Charette AI Group keep maintaining it and open-sourcing
+# its other tools.
+#
+# <p align="center">
+#   <a href="https://www.paypal.com/donate/?hosted_button_id=FEM4WLD7LHY36">
+#       <img src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" alt="Donate with PayPal">
+#   </a>
+# </p>

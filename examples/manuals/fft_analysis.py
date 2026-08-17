@@ -559,3 +559,19 @@ print(f"section 5 OK - THD {100 * from_bands:.2f} % by both routes, "
 # To use your own data, replace the `load(...)` calls with
 # `read_tdms("run.tdms")`, `read_wave("take1.wav")` or
 # `read_hdf5("measurement.h5")`. Everything downstream is unchanged.
+
+# %% [markdown]
+# ---
+#
+# ## Support This Work
+#
+# If anything here was useful to you, please consider contributing.
+# SPWB is free and open source, and always will be — donations are
+# what let Charette AI Group keep maintaining it and open-sourcing
+# its other tools.
+#
+# <p align="center">
+#   <a href="https://www.paypal.com/donate/?hosted_button_id=FEM4WLD7LHY36">
+#       <img src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" alt="Donate with PayPal">
+#   </a>
+# </p>

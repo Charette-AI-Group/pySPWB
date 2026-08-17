@@ -365,3 +365,19 @@ print("section 3 OK - small steps are more accurate, 2 taps 'converges' to "
 # `read_hdf5("measurement.h5")` and pick the two roles. The one thing that
 # matters is the reference: correlated with the interference, uncorrelated
 # with what you want to keep.
+
+# %% [markdown]
+# ---
+#
+# ## Support This Work
+#
+# If anything here was useful to you, please consider contributing.
+# SPWB is free and open source, and always will be — donations are
+# what let Charette AI Group keep maintaining it and open-sourcing
+# its other tools.
+#
+# <p align="center">
+#   <a href="https://www.paypal.com/donate/?hosted_button_id=FEM4WLD7LHY36">
+#       <img src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" alt="Donate with PayPal">
+#   </a>
+# </p>
