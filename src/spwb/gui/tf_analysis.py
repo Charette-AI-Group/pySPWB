@@ -267,7 +267,8 @@ class TransferFunctionWindow(QMainWindow):
         window_menu.addAction(act)
 
         # the same Help menu the hub window carries: manuals, then About
-        about.add_help_menu(self)
+        about.add_help_menu(self, manual="transfer-function",
+                            manual_title="Transfer Function")
 
     # -- roles ---------------------------------------------------------------
     def _set_role(self, role: str) -> None:

@@ -42,6 +42,7 @@ __all__ = [
     "REPO_URL",
     "RESOURCES_DIR",
     "icon_file",
+    "manual_url",
 ]
 
 # -- identity --------------------------------------------------------------
@@ -69,6 +70,19 @@ LABVIEW_REPO_URL = "https://github.com/Charette-AI-Group/SPWB"
 #: companion notebooks, a local .md would open in a text editor, and most
 #: users install the wheel and have no local copy at all.
 MANUALS_URL = f"{REPO_URL}/tree/main/docs/manuals"
+
+
+def manual_url(name: str | None = None) -> str:
+    """The URL of one manual, or of the index when ``name`` is None.
+
+    ``name`` is the file's stem in ``docs/manuals`` - "fft-analysis" and so
+    on - so each window can ask for its own page and F1 lands on the manual
+    for the window you are actually in.
+    """
+    if not name:
+        return MANUALS_URL
+    return f"{REPO_URL}/blob/main/docs/manuals/{name}.md"
+
 
 # -- brand colours ---------------------------------------------------------
 # Dark text on yellow, matching CloakClip and the SAE Calculator so the

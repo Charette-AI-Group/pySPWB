@@ -285,7 +285,8 @@ class FFTWindow(QMainWindow):
         window_menu.addAction(act)
 
         # the same Help menu the hub window carries: manuals, then About
-        about.add_help_menu(self)
+        about.add_help_menu(self, manual="fft-analysis",
+                            manual_title="FFT Analysis")
 
     # -- parameters ----------------------------------------------------------
     @property

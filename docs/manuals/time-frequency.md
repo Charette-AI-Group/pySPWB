@@ -179,7 +179,7 @@ reading every time you change the block size.
 |---|---|
 | **Signals** | Import Signals ... > Another Window (`Ctrl+I`), Export sections to clipboard, Exit |
 | **Window** | New TFA Window (`Ctrl+N`) |
-| **Help** | **User Manuals ...** (`F1`), About SPWB |
+| **Help** | **Time-Frequency Manual** (`F1`) — this page, All User Manuals ..., About SPWB |
 
 ---
 

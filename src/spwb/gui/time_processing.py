@@ -337,7 +337,8 @@ class TimeProcessingWindow(QMainWindow):
         # "Help" rather than the original's "About": the manuals are the
         # first thing a new user needs, and nobody looks under About for
         # documentation. Every analysis window carries the same menu.
-        about.add_help_menu(self)
+        about.add_help_menu(self, manual="time-processing",
+                            manual_title="Time Processing")
 
     # -- list / plot ---------------------------------------------------------
     def _refresh_list(self) -> None:

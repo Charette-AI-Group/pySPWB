@@ -191,7 +191,7 @@ setting, since coherence is a fraction between 0 and 1.
 |---|---|
 | **Signals** | Import Signals ... > Another Window (`Ctrl+I`), Export results to clipboard, Exit |
 | **Window** | New TF Window (`Ctrl+N`) |
-| **Help** | **User Manuals ...** (`F1`), About SPWB |
+| **Help** | **Transfer Function Manual** (`F1`) — this page, All User Manuals ..., About SPWB |
 
 ---
 

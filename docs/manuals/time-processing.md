@@ -218,10 +218,11 @@ for each.
 | **Signals** | Create ... (synthesise a signal), Import Signals ... from another window or a file |
 | **Analysis** | Spectrums (FFT) `Ctrl+F`, Transfer Functions `Ctrl+T`, Time Frequency Analysis `Ctrl+G`, Adaptive Filtering (LMS) `Ctrl+L` |
 | **Window** | New and duplicate windows |
-| **Help** | **User Manuals ...** (`F1`), About SPWB |
+| **Help** | **Time Processing Manual** (`F1`) — this page, All User Manuals ..., About SPWB |
 
-Every analysis window carries the same **Help** menu, so the manuals are one
-keystroke away wherever you are.
+Every analysis window carries the same **Help** menu, and `F1` is
+context-sensitive: it opens the manual for the window you are in. The
+other four are always one entry below, under **All User Manuals ...**.
 
 ---
 

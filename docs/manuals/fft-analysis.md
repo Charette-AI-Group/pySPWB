@@ -245,7 +245,7 @@ achievable, and that a signal could not be transformed at all.
 |---|---|
 | **Signals** | Import Signals ... > Another Window (`Ctrl+I`), Export spectra to clipboard, Exit |
 | **Window** | New FFT Window (`Ctrl+N`), Duplicate Current Window |
-| **Help** | **User Manuals ...** (`F1`), About SPWB |
+| **Help** | **FFT Analysis Manual** (`F1`) — this page, All User Manuals ..., About SPWB |
 
 ---
 

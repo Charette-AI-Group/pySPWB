@@ -197,7 +197,7 @@ FFT window or save it. Until you press it, the run is only on screen.
 |---|---|
 | **Signals** | Import Signals ... > Another Window (`Ctrl+I`), Exit |
 | **Window** | New Adaptive Filtering Window (`Ctrl+N`) |
-| **Help** | **User Manuals ...** (`F1`), About SPWB |
+| **Help** | **Adaptive Filtering Manual** (`F1`) — this page, All User Manuals ..., About SPWB |
 
 ---
 
