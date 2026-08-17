@@ -9,6 +9,7 @@ notice.
 """
 import os
 import struct
+import sys
 
 import pytest
 
@@ -90,16 +91,35 @@ def test_each_icon_carries_every_size(key):
     assert ico_sizes(app_config.window_icon_file(key)) == EXPECTED_SIZES
 
 
-def test_the_application_icon_carries_every_size():
-    assert ico_sizes(app_config.icon_file()) == EXPECTED_SIZES
+def test_the_windows_and_linux_application_icon_carries_every_size():
+    """Tested by name, not through icon_file(), which is platform-dependent.
+
+    Both application icons exist on every platform - only which one gets
+    *used* varies - so asking icon_file() for an .ico passes on Windows and
+    fails on macOS, which is exactly how this test broke in CI once.
+    """
+    ico = app_config.RESOURCES_DIR / "spwb.ico"
+
+    assert ico.is_file()
+    assert ico_sizes(ico) == EXPECTED_SIZES
 
 
-def test_the_large_png_for_macos_exists():
-    """app_config picks the .png on darwin, so it has to be there."""
+def test_the_macos_application_icon_is_a_large_png():
     png = app_config.RESOURCES_DIR / "spwb.png"
 
     assert png.is_file()
-    assert QIcon(str(png)).availableSizes(), "unreadable as an icon"
+    sizes = QIcon(str(png)).availableSizes()
+    assert sizes, "unreadable as an icon"
+    assert sizes[0].width() == 1024, "macOS wants the big one"
+
+
+def test_icon_file_picks_the_format_this_platform_wants():
+    """macOS takes the PNG, everything else the multi-size .ico."""
+    chosen = app_config.icon_file()
+
+    assert chosen is not None
+    assert chosen.name == ("spwb.png" if sys.platform == "darwin"
+                           else "spwb.ico")
 
 
 @pytest.mark.parametrize("key", sorted(WINDOWS))
