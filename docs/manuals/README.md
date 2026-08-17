@@ -11,11 +11,17 @@ application actually produces — not one derived on paper and hoped for.
 | [FFT Analysis](fft-analysis.md) | Spectra, windows, dB, weighting, energy bands | 04–08 | [notebook](notebooks/fft-analysis.ipynb) |
 | [Transfer Function](transfer-function.md) | Frequency response, coherence, H1/H2/H3 | 09–11 | [notebook](notebooks/transfer-function.ipynb) |
 | [Time-Frequency Analysis](time-frequency.md) | Spectrograms, the block-size trade, cursor sections | 12–13 | [notebook](notebooks/time-frequency.ipynb) |
-| Adaptive Filtering (LMS) | *(to be written)* | 14 | |
+| [Adaptive Filtering (LMS)](adaptive-filtering.md) | Noise cancellation, filter length, step size | 14 | [notebook](notebooks/adaptive-filtering.ipynb) |
 
-Each manual drives the application; each notebook works the same examples
-in code, one section per example. GitHub renders the notebooks with their
-output and graphs, so a reader needs nothing installed to read one.
+**The set is complete: all five windows are documented.** Each manual drives
+the application; each notebook works the same examples in code, one section
+per example. GitHub renders the notebooks with their output and graphs, so a
+reader needs nothing installed to read one.
+
+The manuals are also reachable from inside the application, under
+**Help > User Manuals ...**, and the datasets they teach through are created
+by **File > Create Demo Data ...** — so nothing here requires a git
+checkout.
 
 Also see [`../hdf5-format.md`](../hdf5-format.md) for the native file
 format.

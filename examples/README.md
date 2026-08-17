@@ -38,6 +38,7 @@ nothing to download.
 | [`manuals/fft_analysis.py`](manuals/fft_analysis.py) | Spectra: amplitude accuracy, leakage and window choice, dB and SPL, A-weighting, THD and energy bands. → [rendered notebook](../docs/manuals/notebooks/fft-analysis.ipynb) · [manual](../docs/manuals/fft-analysis.md) |
 | [`manuals/transfer_function.py`](manuals/transfer_function.py) | Frequency response of a known resonance, the phase crossing, bias error against resolution, coherence, and the H1 = γ²·H2 identity. → [rendered notebook](../docs/manuals/notebooks/transfer-function.ipynb) · [manual](../docs/manuals/transfer-function.md) |
 | [`manuals/time_frequency.py`](manuals/time_frequency.py) | Spectrograms: sweeps as diagonals, Gabor's block-size trade measured, the cursor's two sections, and scalloping on the bin grid. → [rendered notebook](../docs/manuals/notebooks/time-frequency.ipynb) · [manual](../docs/manuals/time-frequency.md) |
+| [`manuals/adaptive_filtering.py`](manuals/adaptive_filtering.py) | LMS noise cancellation: a tone four times below the noise recovered to within 1 %, the filter-length cliff, and why "converged" does not mean "worked". → [rendered notebook](../docs/manuals/notebooks/adaptive-filtering.ipynb) · [manual](../docs/manuals/adaptive-filtering.md) |
 
 ### Using one
 

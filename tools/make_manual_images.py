@@ -371,6 +371,75 @@ def shot_tfa_block_size() -> None:
     window.close()
 
 
+def lms_window(signals, *, reference, noisy, size=(1220, 830), taps=None,
+               step=None, filter_class=None, run=True):
+    """An Adaptive Filtering window with both roles set, optionally run.
+
+    ``reference`` and ``noisy`` name the two signals. Setting them by name
+    matters more here than anywhere else: getting them the wrong way round
+    is the mistake the window exists to warn about, and a shot that made it
+    silently would teach it.
+    """
+    from spwb.gui.bridge import WindowManager
+    from spwb.gui.lms_analysis import LMSWindow
+
+    session()
+    window = LMSWindow(WindowManager())
+    window.resize(*size)
+    for signal in signals:
+        window.store.add(signal)
+
+    for box, name in ((window.reference_box, reference),
+                      (window.noisy_box, noisy)):
+        index = box.findText(name)
+        if index < 0:
+            raise SystemExit(
+                f"no signal {name!r}; window has "
+                f"{[box.itemText(i) for i in range(box.count())]}")
+        box.setCurrentIndex(index)
+
+    if taps is not None:
+        window.filter_length.setValue(taps)
+    if step is not None:
+        window.step_size.setValue(step)
+    if filter_class is not None:
+        window.filter_class.setCurrentText(filter_class)
+    if run:
+        window.run()
+    return window
+
+
+def _lms_demo():
+    return demo("14_LMS_Noise_cancellation.h5",
+                "Reference (the noise source)",
+                "Noisy (tone buried in noise)")
+
+
+def shot_lms_overview() -> None:
+    """A successful cancellation: the tone comes out of the noise."""
+    window = lms_window(_lms_demo(),
+                        reference="Reference (the noise source)",
+                        noisy="Noisy (tone buried in noise)",
+                        taps=64, step=0.1)
+    session().processEvents()
+    # after convergence, and short enough that the 120 Hz tone is visible
+    window.signal_plot.viewbox.setXRange(10.0, 10.05, padding=0)
+    capture(window, "lms_overview")
+    window.close()
+
+
+def shot_lms_too_few_taps() -> None:
+    """The same run with a filter too short to represent the path."""
+    window = lms_window(_lms_demo(),
+                        reference="Reference (the noise source)",
+                        noisy="Noisy (tone buried in noise)",
+                        taps=8, step=0.1)
+    session().processEvents()
+    window.signal_plot.viewbox.setXRange(10.0, 10.05, padding=0)
+    capture(window, "lms_too_few_taps")
+    window.close()
+
+
 def shot_time_processing_attributes() -> None:
     """A selected signal, with the attributes panel stating its answer."""
     window = time_processing(demo("01_TimeProcessing_Stats_known_values.h5"))
@@ -549,6 +618,8 @@ SHOTS = {
     "tfa_log_sweep": shot_tfa_log_sweep,
     "tfa_bursts_cursor": shot_tfa_bursts_cursor,
     "tfa_block_size": shot_tfa_block_size,
+    "lms_overview": shot_lms_overview,
+    "lms_too_few_taps": shot_lms_too_few_taps,
     "about_dialog": shot_about_dialog,
 }
 

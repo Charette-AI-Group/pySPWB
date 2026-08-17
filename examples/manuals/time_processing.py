@@ -64,8 +64,14 @@ import numpy as np
 try:                                    # notebook: draw figures inline
     get_ipython().run_line_magic("matplotlib", "inline")
 except NameError:                       # plain script: draw to a buffer
+    import warnings
+
     import matplotlib
     matplotlib.use("Agg")
+    # plt.show() is a no-op under Agg and says so once per figure; the
+    # figures are still built, and the notebook build uses the inline
+    # backend where they are captured.
+    warnings.filterwarnings("ignore", message="FigureCanvasAgg is non-interactive")
 import matplotlib.pyplot as plt
 
 
