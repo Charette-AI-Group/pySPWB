@@ -284,6 +284,93 @@ def shot_tf_estimator_h2() -> None:
     _estimator_shot("H2", "tf_estimator_h2")
 
 
+def tfa_window(signals, *, channel=None, size=(1280, 830), block=None,
+               overlap=None, cursor=None, window_type=None, **controls):
+    """A Time-Frequency window with one channel selected and a cursor set.
+
+    ``channel`` names the signal to analyse - this window shows one at a
+    time - and ``cursor`` is a ``(time_s, frequency_hz)`` pair placed on the
+    cross-hair, which is what drives the two section plots.
+    """
+    from spwb.gui.bridge import WindowManager
+    from spwb.gui.tfa_analysis import TimeFrequencyWindow
+
+    session()
+    window = TimeFrequencyWindow(WindowManager())
+    window.resize(*size)
+    for signal in signals:
+        window.store.add(signal)
+
+    if channel is not None:
+        index = window.channel.findText(channel)
+        if index < 0:
+            raise SystemExit(
+                f"no channel {channel!r}; window has "
+                f"{[window.channel.itemText(i) for i in range(window.channel.count())]}")
+        window.channel.setCurrentIndex(index)
+    if block is not None:
+        window.block_size.setCurrentText(str(block))
+    if overlap is not None:
+        window.overlap.setValue(overlap)
+    if window_type is not None:
+        index = window.window_box.findData(window_type)
+        if index < 0:
+            raise SystemExit(f"no window named {window_type!r}")
+        window.window_box.setCurrentIndex(index)
+    for control, value in controls.items():
+        getattr(window, control).setCurrentText(value)
+
+    window.recompute()
+    if cursor is not None:
+        window.v_line.setValue(float(cursor[0]))
+        window.h_line.setValue(float(cursor[1]))
+    return window
+
+
+def shot_tfa_overview() -> None:
+    """A linear sweep is a straight diagonal - the window's defining picture."""
+    window = tfa_window(demo("12_TFA_Sweeps_linear_and_log.h5"),
+                        channel="Linear sweep 20 to 2000 Hz",
+                        cursor=(10.0, 1008.0))
+    session().processEvents()
+    window.image_plot.viewbox.setYRange(0.0, 2500.0, padding=0)
+    capture(window, "tfa_overview")
+    window.close()
+
+
+def shot_tfa_log_sweep() -> None:
+    """The same endpoints, curved: equal time per octave."""
+    window = tfa_window(demo("12_TFA_Sweeps_linear_and_log.h5"),
+                        channel="Logarithmic sweep 20 to 2000 Hz",
+                        cursor=(10.0, 200.0))
+    session().processEvents()
+    window.image_plot.viewbox.setYRange(0.0, 2500.0, padding=0)
+    capture(window, "tfa_log_sweep")
+    window.close()
+
+
+def shot_tfa_bursts_cursor() -> None:
+    """The headline check: at t = 3.5 s the Time Section shows two peaks."""
+    window = tfa_window(demo("13_TFA_Tone_bursts.h5"),
+                        cursor=(3.5, 400.0))
+    session().processEvents()
+    window.image_plot.viewbox.setYRange(0.0, 2000.0, padding=0)
+    window.time_section_plot.viewbox.setXRange(0.0, 2000.0, padding=0)
+    capture(window, "tfa_bursts_cursor")
+    window.close()
+
+
+def shot_tfa_block_size() -> None:
+    """The longest block: fine in frequency, smeared in time."""
+    window = tfa_window(demo("12_TFA_Sweeps_linear_and_log.h5"),
+                        channel="Linear sweep 20 to 2000 Hz",
+                        block=8192, cursor=(10.0, 1008.0))
+    session().processEvents()
+    window.image_plot.viewbox.setYRange(0.0, 2500.0, padding=0)
+    capture(window, "tfa_block_size")
+    window.close()
+
+
 def shot_time_processing_attributes() -> None:
     """A selected signal, with the attributes panel stating its answer."""
     window = time_processing(demo("01_TimeProcessing_Stats_known_values.h5"))
@@ -458,6 +545,10 @@ SHOTS = {
     "tf_coherence_interference": shot_tf_coherence_interference,
     "tf_estimator_h1": shot_tf_estimator_h1,
     "tf_estimator_h2": shot_tf_estimator_h2,
+    "tfa_overview": shot_tfa_overview,
+    "tfa_log_sweep": shot_tfa_log_sweep,
+    "tfa_bursts_cursor": shot_tfa_bursts_cursor,
+    "tfa_block_size": shot_tfa_block_size,
     "about_dialog": shot_about_dialog,
 }
 
