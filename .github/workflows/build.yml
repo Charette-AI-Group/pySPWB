@@ -1,0 +1,158 @@
+# Builds the standalone application - the download for people who do not
+# have Python. Windows and macOS (Apple Silicon and Intel).
+#
+# Pushing a version tag (v*) additionally publishes a GitHub Release with
+# every binary attached:  git tag -a v1.1.0 -m "..." && git push origin v1.1.0
+# Otherwise the results are under the run's "Artifacts" section.
+#
+# There is no Linux build on purpose: a PyInstaller bundle is pinned to the
+# glibc of the machine that built it, so the runner's Ubuntu would decide
+# which distributions it runs on - and Linux users have a working Python and
+# "pip install spwb[gui]" already.
+#
+# Correctness is tests.yml's job, which gates every push to main. What this
+# workflow has to prove is different and packaging-specific: that the built
+# bundle still has its icons, its Qt platform plugin, a working h5py and a
+# scipy that produces the right numbers. That is "spwb --selftest", run
+# below against the executable itself rather than against the source tree.
+
+name: build
+
+on:
+  push:
+    tags:
+      - "v*"
+    branches: [main]
+    # Only when something that can change the bundle changes.
+    paths:
+      - "spwb.spec"
+      - "pyproject.toml"
+      - "tools/standalone_entry.py"
+      - "src/spwb/selftest.py"
+      - ".github/workflows/build.yml"
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: ${{ matrix.label }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            label: windows x64
+            artifact: spwb-windows-x64
+            asset: SPWB-windows-x64.zip
+          - os: macos-latest
+            label: macOS Apple Silicon
+            artifact: spwb-macos-apple-silicon
+            asset: SPWB-macos-apple-silicon.zip
+          # macos-latest is Apple Silicon only, and a bundle built there
+          # will not run on an Intel Mac. This is the second half of "any
+          # Mac", and it is the runner that will disappear first.
+          - os: macos-13
+            label: macOS Intel
+            artifact: spwb-macos-intel
+            asset: SPWB-macos-intel.zip
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      # Not the newest Python available: the interpreter is bundled, so the
+      # user never sees it, and a version every wheel we depend on already
+      # ships binaries for is worth more here than being current.
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install the application and the build tools
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install ".[build]"
+
+      - name: Build
+        run: python -m PyInstaller spwb.spec --noconfirm
+
+      # A windowed executable detaches on Windows, so PowerShell has to be
+      # told to wait for it - otherwise the report is read before it exists
+      # and the step passes without having checked anything.
+      - name: Verify the build is complete
+        if: runner.os == 'Windows'
+        run: |
+          $proc = Start-Process -FilePath ".\dist\SPWB\SPWB.exe" `
+            -ArgumentList "--selftest","selftest.txt" -Wait -PassThru
+          Get-Content selftest.txt
+          if ($proc.ExitCode -ne 0) { exit $proc.ExitCode }
+
+      - name: Verify the build is complete
+        if: runner.os == 'macOS'
+        run: |
+          ./dist/SPWB.app/Contents/MacOS/SPWB --selftest selftest.txt
+          cat selftest.txt
+
+      # One file to download, and - on macOS - the only way to keep the
+      # bundle intact: upload-artifact does not preserve the .app's symlinks
+      # or executable bits, while ditto does.
+      - name: Package (Windows)
+        if: runner.os == 'Windows'
+        run: Compress-Archive -Path dist\SPWB -DestinationPath dist\${{ matrix.asset }}
+
+      - name: Package (macOS)
+        if: runner.os == 'macOS'
+        run: ditto -c -k --keepParent "dist/SPWB.app" "dist/${{ matrix.asset }}"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: dist/${{ matrix.asset }}
+          if-no-files-found: error
+
+      # Kept whether the run passed or failed: when the self-test fails,
+      # this file is the only account of what the bundle was missing.
+      - name: Upload the self-test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: selftest-${{ matrix.artifact }}
+          path: selftest.txt
+          if-no-files-found: warn
+
+  # Release assets never expire; workflow artifacts are deleted after 90
+  # days, so a tagged build has to be copied somewhere permanent.
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download the built applications
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          pattern: spwb-*
+
+      - name: Attach them to the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="${{ github.ref_name }}"
+          find artifacts -name '*.zip' -exec mv {} . \;
+          # Unsigned downloads: a checksum is the only way for someone to
+          # tell a real one from a tampered copy.
+          sha256sum SPWB-*.zip > SPWB-checksums.txt
+          cat SPWB-checksums.txt
+          files=(SPWB-*.zip SPWB-checksums.txt)
+          if gh release view "$tag" --repo "${{ github.repository }}" >/dev/null 2>&1; then
+            gh release upload "$tag" "${files[@]}" --repo "${{ github.repository }}" --clobber
+          else
+            gh release create "$tag" "${files[@]}" \
+              --repo "${{ github.repository }}" \
+              --title "SPWB ${tag#v}" \
+              --generate-notes
+          fi

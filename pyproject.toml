@@ -53,6 +53,17 @@ dev = [
     "nptdms>=1.7",
     "matplotlib>=3.7",   # examples/ only
 ]
+# The standalone application: dist/SPWB, built by spwb.spec and published
+# from .github/workflows/build.yml for people who do not have Python. Not
+# needed to use SPWB any other way.
+build = [
+    "pyinstaller>=6.10",
+    # PyInstaller converts resources/spwb.png to .icns through Pillow when
+    # building the macOS bundle; without it the .app gets no icon.
+    "pillow>=10",
+    # the application itself, so one "pip install .[build]" is enough
+    "spwb[gui]",
+]
 # Building the rendered notebooks that ship beside the user manuals, with
 # tools/make_example_notebooks.py. Maintainers only: the example scripts
 # themselves run with matplotlib alone, and tests/test_examples.py exercises

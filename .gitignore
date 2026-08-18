@@ -35,3 +35,6 @@ Thumbs.db
 # clean checkout simply re-creates them.
 /.data/
 /.screenshots/
+
+# the report written by "spwb --selftest" / tools/build_standalone.py
+selftest.txt

@@ -22,6 +22,33 @@ pip install spwb          # the library: numpy + scipy, no GUI stack
 pip install spwb[gui]     # the full application, then run:  spwb
 ```
 
+### No Python on the machine? Download the application
+
+The desktop application is also published as a **standalone build** that
+carries its own Python, so nothing has to be installed to run it — the
+successor to the compiled builds the
+[original LabVIEW SPWB](https://github.com/Charette-AI-Group/SPWB) shipped
+for people without LabVIEW.
+
+| | |
+|---|---|
+| **Windows** | `SPWB-windows-x64.zip` — unzip, run `SPWB.exe` |
+| **macOS** (Apple Silicon) | `SPWB-macos-apple-silicon.zip` |
+| **macOS** (Intel) | `SPWB-macos-intel.zip` |
+
+Get them from the [**latest release**](https://github.com/Charette-AI-Group/pySPWB/releases/latest).
+Unzip the whole folder and keep it together — the executable needs the files
+beside it. Each release also carries `SPWB-checksums.txt`.
+
+The builds are **not code-signed**, so the first launch needs one extra step:
+Windows SmartScreen shows *More info → Run anyway*, and macOS refuses until
+you right-click the app and choose **Open** once (or run
+`xattr -cr /path/to/SPWB.app`). Signing certificates cost money yearly; the
+checksums are there so a download can be verified without them.
+
+There is no Linux build: a bundle is tied to the glibc of the machine that
+made it, and `pip install spwb[gui]` works well on Linux.
+
 Its native file format is plain **HDF5**, so a measurement saved here opens
 in MATLAB, Julia, R or HDFView without SPWB installed —
 see [`docs/hdf5-format.md`](https://github.com/Charette-AI-Group/pySPWB/blob/main/docs/hdf5-format.md).

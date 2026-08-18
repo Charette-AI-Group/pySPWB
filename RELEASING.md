@@ -47,6 +47,31 @@ That is the whole setup. No secrets are ever added to the repository.
    suite, builds the sdist and wheel, checks the metadata, verifies the tag
    matches, and uploads to PyPI.
 
+## The standalone application
+
+The same tag publishes the downloads for people without Python.
+`.github/workflows/build.yml` builds `dist/SPWB` on Windows, Apple Silicon
+and Intel macOS, runs `spwb --selftest` against each built executable, and
+attaches the three zips plus `SPWB-checksums.txt` to the release created
+above. Nothing extra to do — but two things are worth knowing:
+
+* **The self-test is the gate.** A bundle can build cleanly and still be
+  missing its icons, its Qt platform plugin or a working h5py; every one of
+  those is silent at startup and fatal later. If a build job fails, the
+  `selftest-*` artifact on the run says exactly which check failed. Never
+  publish past a red one.
+* **The builds are unsigned**, so users meet SmartScreen on Windows and
+  Gatekeeper on macOS. Both are documented in the README's download
+  section. Signing would need a certificate (and an Apple Developer
+  account at $99/year) — until then the checksums file is what lets people
+  verify a download.
+
+To try the whole thing without releasing anything: Actions → **build** →
+*Run workflow*. It builds all three and uploads them as run artifacts,
+skipping the release job entirely. Locally, `python
+tools/build_standalone.py` (or double-clicking `buildStandalone.cmd`) does
+one platform and runs the same self-test.
+
 ## Trying it against TestPyPI first
 
 Actions → **publish** → *Run workflow* → target `testpypi`. Then check the
