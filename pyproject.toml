@@ -11,9 +11,9 @@ license = { text = "MIT" }
 authors = [{ name = "Charette AI Group" }]
 requires-python = ">=3.10"
 keywords = ["signal processing", "dsp", "fft", "spectrum", "spectrogram",
-            "transfer function", "coherence", "vibration", "acoustics",
-            "tdms", "labview", "rpc3", "nastran", "head acoustics",
-            "artemis"]
+            "transfer function", "coherence", "frequency response",
+            "adaptive filtering", "vibration", "acoustics", "measurement",
+            "hdf5", "tdms", "rpc3", "nastran", "head acoustics", "artemis"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Science/Research",
