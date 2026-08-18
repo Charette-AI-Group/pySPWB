@@ -63,13 +63,13 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       # Not the newest Python available: the interpreter is bundled, so the
       # user never sees it, and a version every wheel we depend on already
       # ships binaries for is worth more here than being current.
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: "3.13"
 
@@ -110,7 +110,7 @@ jobs:
         run: ditto -c -k --keepParent "dist/SPWB.app" "dist/${{ matrix.asset }}"
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.artifact }}
           path: dist/${{ matrix.asset }}
@@ -120,7 +120,7 @@ jobs:
       # this file is the only account of what the bundle was missing.
       - name: Upload the self-test report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: selftest-${{ matrix.artifact }}
           path: selftest.txt
@@ -145,8 +145,15 @@ jobs:
       contents: write
 
     steps:
+      # v7, not the current v8, deliberately. v8 stopped unzipping
+      # unconditionally - it reads Content-Type and leaves non-zip
+      # files alone - and every artifact here IS a single .zip, so
+      # the risk is being handed an unpacked SPWB folder instead of
+      # SPWB-windows-x64.zip. This job only runs on a tag, so that
+      # would surface during a release and nowhere else. v7 clears
+      # the Node 20 deprecation, which was the whole point.
       - name: Download the built applications
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           path: artifacts
           pattern: spwb-*
