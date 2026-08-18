@@ -24,9 +24,9 @@ pip install spwb[gui]     # the full application, then run:  spwb
 
 Its native file format is plain **HDF5**, so a measurement saved here opens
 in MATLAB, Julia, R or HDFView without SPWB installed —
-see [`docs/hdf5-format.md`](docs/hdf5-format.md).
+see [`docs/hdf5-format.md`](https://github.com/Charette-AI-Group/pySPWB/blob/main/docs/hdf5-format.md).
 
-There is a [**user manual**](docs/manuals/) for every analysis window, each
+There is a [**user manual**](https://github.com/Charette-AI-Group/pySPWB/tree/main/docs/manuals) for every analysis window, each
 working through demonstration datasets you can create from the File menu,
 with a companion notebook that computes the same numbers in a few lines.
 
@@ -188,7 +188,7 @@ the right default for a LabVIEW application; for an open-source Python one,
 HDF5 is an open standard with the same data model (file → groups →
 channels, attributes at every level) that MATLAB, Julia, R, C++ and
 HDFView read natively. The layout is written down in
-[`docs/hdf5-format.md`](docs/hdf5-format.md) so the files stay meaningful
+[`docs/hdf5-format.md`](https://github.com/Charette-AI-Group/pySPWB/blob/main/docs/hdf5-format.md) so the files stay meaningful
 without this project.
 
 Three choices are load-bearing and easy to undo by accident:
@@ -443,12 +443,12 @@ opens them.
 
 ### User manuals
 
-[`docs/manuals/`](docs/manuals/) holds **a manual for every analysis
-window** — [Time Processing](docs/manuals/time-processing.md),
-[FFT Analysis](docs/manuals/fft-analysis.md),
-[Transfer Function](docs/manuals/transfer-function.md),
-[Time-Frequency](docs/manuals/time-frequency.md) and
-[Adaptive Filtering](docs/manuals/adaptive-filtering.md) — each working
+[`docs/manuals/`](https://github.com/Charette-AI-Group/pySPWB/tree/main/docs/manuals) holds **a manual for every analysis
+window** — [Time Processing](https://github.com/Charette-AI-Group/pySPWB/blob/main/docs/manuals/time-processing.md),
+[FFT Analysis](https://github.com/Charette-AI-Group/pySPWB/blob/main/docs/manuals/fft-analysis.md),
+[Transfer Function](https://github.com/Charette-AI-Group/pySPWB/blob/main/docs/manuals/transfer-function.md),
+[Time-Frequency](https://github.com/Charette-AI-Group/pySPWB/blob/main/docs/manuals/time-frequency.md) and
+[Adaptive Filtering](https://github.com/Charette-AI-Group/pySPWB/blob/main/docs/manuals/adaptive-filtering.md) — each working
 through demonstration datasets whose expected values
 `tools/verify_demo_data.py` checks, so every number a manual quotes is one
 the application demonstrably produces. They are also reachable from inside
@@ -464,10 +464,10 @@ regenerated with `python tools/make_manual_images.py`.)
 
 Every manual has a **companion notebook** working the same examples in
 code — [FFT Analysis — worked
-examples](docs/manuals/notebooks/fft-analysis.ipynb), rendered by GitHub
+examples](https://github.com/Charette-AI-Group/pySPWB/blob/main/docs/manuals/notebooks/fft-analysis.ipynb), rendered by GitHub
 with its graphs — so the same material serves both the person clicking
 through the application and the person scripting it. Their sources live in
-[`examples/manuals/`](examples/manuals/) and each section asserts the
+[`examples/manuals/`](https://github.com/Charette-AI-Group/pySPWB/tree/main/examples/manuals) and each section asserts the
 numbers its manual quotes, which `tests/test_examples.py` runs.
 
 ### The graph palette
