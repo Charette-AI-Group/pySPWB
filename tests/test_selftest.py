@@ -10,6 +10,7 @@ The checks themselves are also run for real here, in the source tree, where
 they must pass - so a change to the DSP or the resources that would break
 the packaged application breaks the suite first.
 """
+import importlib.util
 import os
 import subprocess
 import sys
@@ -23,6 +24,15 @@ pytest.importorskip("pyqtgraph")
 
 from spwb import cli, selftest
 
+#: The self-test insists on h5py, and it is right to: a packaged build
+#: always has it (the gui extra pulls io in), and a bundle that cannot read
+#: SPWB's own native format is broken. A source checkout is the one place
+#: where its absence is legitimate rather than a defect, so the checks that
+#: need it skip here instead of failing.
+needs_io = pytest.mark.skipif(
+    importlib.util.find_spec("h5py") is None,
+    reason='needs the io extra: pip install -e ".[dev]"')
+
 
 # -- the checks, run for real -----------------------------------------------
 @pytest.fixture(scope="module")
@@ -31,6 +41,7 @@ def outcome():
     return selftest.run()
 
 
+@needs_io
 def test_it_passes_in_the_source_tree(outcome):
     passed, report = outcome
     assert passed, report
@@ -57,6 +68,8 @@ def test_the_report_names_what_it_ran_on(outcome):
                          ids=[c[0] for c in selftest.CHECKS])
 def test_each_check_individually(name, check, required):
     """So a failure names the thing that broke, not just 'the self-test'."""
+    if name == "file io" and importlib.util.find_spec("h5py") is None:
+        pytest.skip('needs the io extra: pip install -e ".[dev]"')
     result = selftest._run_check(name, check, required)
 
     assert result.ok, result.detail
@@ -149,6 +162,7 @@ def test_the_flag_works_without_a_report_path(monkeypatch):
     assert seen["called"] and seen["path"] is None
 
 
+@needs_io
 def test_the_flag_does_not_need_a_display():
     """The real invocation CI makes, in a subprocess, with no Qt platform set.
 

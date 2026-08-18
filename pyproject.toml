@@ -45,12 +45,16 @@ io = ["h5py>=3.8", "nptdms>=1.7"]
 # only the application insists on the readers.
 gui = ["PySide6>=6.5", "pyqtgraph>=0.13", "spwb[io]"]
 # RPC-III, Nastran punch and HEAD acoustics HDF need nothing beyond numpy.
+# Everything needed to run the whole suite. It installs the application
+# extra rather than restating its pieces: listing them by hand is how this
+# drifted before - dev carried nptdms but not h5py, so the "full (gui)" CI
+# job silently skipped every HDF5 test and then failed on a self-test that
+# expects SPWB's own native format to work. "spwb[gui]" cannot drift from
+# what "pip install spwb[gui]" actually gives a user.
 dev = [
     "pytest>=7",
     "ruff>=0.5",
-    "PySide6>=6.5",
-    "pyqtgraph>=0.13",
-    "nptdms>=1.7",
+    "spwb[gui]",
     "matplotlib>=3.7",   # examples/ only
 ]
 # The standalone application: dist/SPWB, built by spwb.spec and published
