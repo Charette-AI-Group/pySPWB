@@ -1,0 +1,395 @@
+/* pySPWB site - self-contained, no external fonts or frameworks.
+   Shares its design system with the CloakClip site so the two
+   Charette AI Group applications look like siblings; the accent is
+   SPWB's own indigo, taken from app_config.ACCENT_COLOUR. */
+
+:root {
+  --accent: #4f46e5;
+  --accent-strong: #4338ca;
+  --accent-soft: rgba(99, 102, 241, 0.10);
+  /* Dark green, kept dark enough in both themes that white text stays
+     comfortably above the 4.5:1 contrast minimum. */
+  --donate: #15803d;
+  --donate-strong: #166534;
+  --bg: #ffffff;
+  --bg-alt: #f7f7fb;
+  --bg-code: #f3f4f8;
+  --text: #1f2233;
+  --text-muted: #5b6072;
+  --border: #e4e5ee;
+  --shadow: 0 1px 2px rgba(23, 25, 40, 0.05), 0 8px 24px rgba(23, 25, 40, 0.06);
+  --radius: 10px;
+  --maxWidth: 1120px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --accent: #8b8cf6;
+    --accent-strong: #a5a6f9;
+    --accent-soft: rgba(139, 140, 246, 0.14);
+    --donate: #15803d;
+    --donate-strong: #1a9e4b;
+    --bg: #14151c;
+    --bg-alt: #1a1c25;
+    --bg-code: #1f2130;
+    --text: #e8e9f0;
+    --text-muted: #a2a6b8;
+    --border: #2b2e3d;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.35);
+  }
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; scroll-padding-top: 88px; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 16px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 { line-height: 1.25; margin: 0 0 .5em; font-weight: 650; }
+h2 { font-size: 1.65rem; margin-top: 0; letter-spacing: -0.01em; }
+h3 { font-size: 1.15rem; margin-top: 2rem; }
+h4 { font-size: 1rem; margin-top: 1.5rem; color: var(--text); }
+p { margin: 0 0 1rem; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+ul, ol { margin: 0 0 1rem; padding-left: 1.25rem; }
+li { margin-bottom: .45rem; }
+strong { font-weight: 650; }
+
+code, kbd {
+  font-family: ui-monospace, SFMono-Regular, "Cascadia Mono", Consolas, monospace;
+  font-size: .875em;
+  background: var(--bg-code);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: .12em .4em;
+}
+kbd { font-weight: 600; }
+
+img { max-width: 100%; height: auto; }
+
+.wrap { max-width: var(--maxWidth); margin: 0 auto; padding: 0 24px; }
+
+/* ---------------------------------------------------------------- nav -- */
+
+.siteNav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: saturate(180%) blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+.siteNav .wrap {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  height: 62px;
+}
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 650; color: var(--text); }
+.brand:hover { text-decoration: none; }
+.brand img { width: 26px; height: 26px; border-radius: 6px; }
+.navLinks { display: flex; gap: 20px; margin-left: auto; align-items: center; }
+.navLinks a { color: var(--text-muted); font-size: .93rem; }
+.navLinks a:hover { color: var(--accent); text-decoration: none; }
+
+@media (max-width: 860px) {
+  .navLinks a:not(.btnSmall) { display: none; }
+}
+
+/* Two buttons plus the brand do not fit a phone at full length, and the
+   label would wrap to two lines inside the button. */
+@media (max-width: 520px) {
+  .wideOnly { display: none; }
+  .navLinks { gap: 10px; }
+}
+
+/* -------------------------------------------------------------- hero --- */
+
+.hero { padding: 72px 0 56px; border-bottom: 1px solid var(--border); }
+.heroGrid { display: grid; grid-template-columns: 1.05fr .95fr; gap: 48px; align-items: center; }
+.heroIcon { width: 76px; height: 76px; border-radius: 18px; margin-bottom: 20px; box-shadow: var(--shadow); }
+.hero h1 { font-size: 2.9rem; letter-spacing: -0.025em; margin-bottom: .35em; }
+.heroLead { font-size: 1.18rem; color: var(--text-muted); margin-bottom: 1.75rem; }
+.heroShot { border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); display: block; }
+
+@media (max-width: 860px) {
+  .hero { padding: 48px 0 40px; }
+  .heroGrid { grid-template-columns: 1fr; gap: 32px; }
+  .hero h1 { font-size: 2.2rem; }
+}
+
+/* ------------------------------------------------------------ buttons -- */
+
+.btnRow { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+
+.btn {
+  display: inline-block;
+  padding: 11px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: .95rem;
+  border: 1px solid transparent;
+  transition: background-color .15s ease, border-color .15s ease;
+}
+.btn:hover { text-decoration: none; }
+.btnPrimary { background: var(--accent); color: #fff; }
+.btnPrimary:hover { background: var(--accent-strong); color: #fff; }
+.btnGhost { border-color: var(--border); color: var(--text); background: var(--bg); }
+.btnGhost:hover { border-color: var(--accent); color: var(--accent); }
+.btnSmall {
+  padding: 7px 14px;
+  border-radius: 7px;
+  background: var(--accent);
+  color: #fff !important;
+  font-weight: 600;
+  font-size: .88rem;
+  white-space: nowrap;
+}
+.btnSmall:hover { background: var(--accent-strong); text-decoration: none; }
+.btnDonate { background: var(--donate); }
+.btnDonate:hover { background: var(--donate-strong); }
+
+.fineprint { color: var(--text-muted); font-size: .875rem; margin-top: 1rem; }
+
+/* ------------------------------------------------------------ layout --- */
+
+.band { padding: 64px 0; border-bottom: 1px solid var(--border); }
+.band.alt { background: var(--bg-alt); }
+.bandHead { max-width: 720px; margin-bottom: 36px; }
+.bandHead p { color: var(--text-muted); font-size: 1.05rem; margin-bottom: 0; }
+
+.cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px;
+}
+.card h3 { margin: 0 0 .4rem; font-size: 1.02rem; }
+.card p { margin: 0; color: var(--text-muted); font-size: .95rem; }
+
+@media (max-width: 860px) { .cards { grid-template-columns: 1fr; } }
+
+/* --------------------------------------------------------- manual ------ */
+
+.manualGrid { display: grid; grid-template-columns: 232px 1fr; gap: 48px; align-items: start; }
+
+.toc { position: sticky; top: 86px; font-size: .92rem; }
+.toc strong {
+  display: block;
+  font-size: .74rem;
+  text-transform: uppercase;
+  letter-spacing: .09em;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+.toc ol { list-style: none; margin: 0; padding: 0; border-left: 2px solid var(--border); }
+.toc li { margin: 0; }
+.toc a {
+  display: block;
+  padding: 6px 0 6px 14px;
+  margin-left: -2px;
+  border-left: 2px solid transparent;
+  color: var(--text-muted);
+}
+.toc a:hover { color: var(--accent); border-left-color: var(--accent); text-decoration: none; }
+
+.manualBody > section { scroll-margin-top: 86px; }
+.manualBody > section + section {
+  margin-top: 44px;
+  padding-top: 40px;
+  border-top: 1px solid var(--border);
+}
+
+@media (max-width: 860px) {
+  .manualGrid { grid-template-columns: 1fr; gap: 28px; }
+  .toc { position: static; }
+}
+
+figure { margin: 22px 0; }
+figure img { border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); display: block; }
+figcaption { color: var(--text-muted); font-size: .875rem; margin-top: 10px; }
+
+.note {
+  border-left: 3px solid var(--accent);
+  background: var(--accent-soft);
+  border-radius: 0 8px 8px 0;
+  padding: 14px 18px;
+  margin: 22px 0;
+}
+.note p:last-child { margin-bottom: 0; }
+.note strong { color: var(--text); }
+
+.steps { counter-reset: step; list-style: none; padding: 0; }
+.steps li { counter-increment: step; position: relative; padding-left: 42px; margin-bottom: 14px; }
+.steps li::before {
+  content: counter(step);
+  position: absolute;
+  left: 0; top: -1px;
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-size: .85rem;
+  font-weight: 650;
+  display: grid;
+  place-items: center;
+}
+
+table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: .95rem; }
+th, td { text-align: left; padding: 11px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+th { font-weight: 650; background: var(--bg-alt); }
+.tableScroll { overflow-x: auto; }
+
+/* -------------------------------------------------------- download ----- */
+
+.downloadGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 8px; }
+.downloadCard {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 26px;
+  background: var(--bg);
+}
+.downloadCard h3 { margin-top: 0; }
+.downloadCard p { color: var(--text-muted); font-size: .95rem; }
+
+@media (max-width: 860px) { .downloadGrid { grid-template-columns: 1fr; } }
+
+/* ---------------------------------------------------------- donate ----- */
+
+.donate { max-width: 760px; }
+.donate h2 { margin-bottom: .6em; }
+
+/* ---------------------------------------------------------- footer ----- */
+
+.siteFooter { padding: 40px 0; color: var(--text-muted); font-size: .9rem; }
+.siteFooter .wrap { display: flex; flex-wrap: wrap; gap: 16px; justify-content: space-between; }
+.siteFooter a { color: var(--text-muted); }
+.siteFooter a:hover { color: var(--accent); }
+
+
+/* ------------------------------------------------- pySPWB additions ---- */
+
+/* A screenshot and its explanation, alternating sides down the page. The
+   picture is the point on a page like this - a measurement engineer
+   recognises their own work in a spectrum far faster than they read a
+   paragraph about one. */
+.feature {
+  display: grid;
+  grid-template-columns: 1fr 1.15fr;
+  gap: 44px;
+  align-items: center;
+  padding: 40px 0;
+  border-bottom: 1px solid var(--border);
+}
+.feature:last-child { border-bottom: 0; }
+.feature.flip .featureText { order: 2; }
+.feature h3 { margin-top: 0; font-size: 1.35rem; }
+.feature p { color: var(--text-muted); }
+.feature img {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  display: block;
+}
+.featureTag {
+  display: inline-block;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-radius: 999px;
+  padding: 4px 11px;
+  margin-bottom: 12px;
+}
+
+@media (max-width: 860px) {
+  .feature { grid-template-columns: 1fr; gap: 24px; padding: 28px 0; }
+  .feature.flip .featureText { order: 0; }
+}
+
+/* Three download cards rather than CloakClip's two. */
+.downloadGrid.three { grid-template-columns: repeat(3, 1fr); }
+@media (max-width: 980px) { .downloadGrid.three { grid-template-columns: 1fr; } }
+
+.downloadCard .platform {
+  font-size: .74rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.downloadCard .size { font-variant-numeric: tabular-nums; }
+
+/* The documentation index: a link list that still reads as a grid. */
+.docsGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.docsCard {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px;
+  background: var(--bg);
+}
+.docsCard h3 { margin: 0 0 .5rem; font-size: 1.02rem; }
+.docsCard ul { margin: 0; padding-left: 1.1rem; }
+.docsCard li { margin-bottom: .35rem; font-size: .95rem; }
+.docsCard p { color: var(--text-muted); font-size: .95rem; margin: 0 0 .6rem; }
+
+@media (max-width: 860px) { .docsGrid { grid-template-columns: 1fr; } }
+
+/* "pip install spwb" wants to be readable from across a room. */
+.codeBlock {
+  background: var(--bg-code);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  font-family: ui-monospace, SFMono-Regular, "Cascadia Mono", Consolas, monospace;
+  font-size: .95rem;
+  overflow-x: auto;
+  margin: 0 0 1rem;
+}
+.codeBlock .comment { color: var(--text-muted); }
+.codeBlock div + div { margin-top: .35rem; }
+
+/* The two ways of running it, side by side, neither one the poor relation. */
+.routeGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.route {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 26px;
+  background: var(--bg);
+}
+.route.headline { border-color: var(--accent); box-shadow: var(--shadow); }
+.route h3 { margin-top: 0; }
+.route ul { color: var(--text-muted); font-size: .95rem; }
+
+@media (max-width: 860px) { .routeGrid { grid-template-columns: 1fr; } }
+
+/* Small facts worth stating without a paragraph around each. */
+.factRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0 0 1.5rem;
+  padding: 0;
+  list-style: none;
+}
+.factRow li {
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: .88rem;
+  color: var(--text-muted);
+  margin: 0;
+  background: var(--bg);
+}

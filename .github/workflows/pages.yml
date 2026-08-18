@@ -1,0 +1,63 @@
+# Publishes the pySPWB website in docs/website to GitHub Pages.
+#
+# Deployed from a workflow rather than by pointing Pages at a folder,
+# because Pages' built-in source can only be the repository root or /docs -
+# and /docs here is real documentation: the five user manuals, their
+# notebooks and the HDF5 format specification, all linked by absolute
+# GitHub URLs from the README, the application's F1 key and PyPI. Serving
+# that folder as a site would put the website's index.html in front of it.
+# Uploading docs/website as the artifact keeps the two apart: the site is
+# the site, and the manuals stay where everything already points.
+#
+# The sibling CloakClip site is a plain main:/docs deployment, which is
+# simpler and right for a repository whose /docs holds nothing else.
+
+name: pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "docs/website/**"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+# What Pages requires: id-token for the deployment's OIDC claim, pages to
+# write the deployment itself.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deployment at a time, and never cancel one half-done - a cancelled
+# Pages deployment can leave the site on the previous version with no
+# indication of which.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v6
+
+      # A static site: no build step, and nothing here needs one. It is one
+      # HTML file, one stylesheet and six screenshots, with no framework, no
+      # external fonts and no CDN, so what is committed is what is served.
+      - name: Upload the site
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: docs/website
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
