@@ -15,30 +15,43 @@ It is two things, and you can use either without the other:
   notebook;
 * a **desktop application** built on it, with multi-window signal sharing:
   send the same signals to an FFT, a transfer function and a spectrogram at
-  once, and they stay in step.
+  once, and they stay in step. Install it with `pip`, or download a
+  standalone build and run it on a machine that has no Python at all.
 
 ```bash
 pip install spwb          # the library: numpy + scipy, no GUI stack
 pip install spwb[gui]     # the full application, then run:  spwb
 ```
 
-### No Python on the machine? Download the application
+**No Python on your machine?**
+[**Download the application**](https://github.com/Charette-AI-Group/pySPWB/releases/latest)
+— it runs as it is, with nothing else to install.
 
-The desktop application is also published as a **standalone build** that
-carries its own Python, so nothing has to be installed to run it — the
+### Download the application — no Python, no installation
+
+The desktop application is also published as a **standalone build**: the
+program, the Python it runs on and every library it needs, in one folder.
+There is **no prerequisite of any kind** — no Python to install, no
+packages, no admin rights, no installer. Unzip it and run it. It is the
 successor to the compiled builds the
 [original LabVIEW SPWB](https://github.com/Charette-AI-Group/SPWB) shipped
-for people without LabVIEW.
+for people who did not have LabVIEW.
 
-| | |
-|---|---|
-| **Windows** | `SPWB-windows-x64.zip` — unzip, run `SPWB.exe` |
-| **macOS** (Apple Silicon) | `SPWB-macos-apple-silicon.zip` |
-| **macOS** (Intel) | `SPWB-macos-intel.zip` |
+| | download | to run |
+|---|---|---|
+| **Windows** (64-bit) | `SPWB-windows-x64.zip` — 94 MB | unzip, then `SPWB.exe` |
+| **macOS** (Apple Silicon) | `SPWB-macos-apple-silicon.zip` — 60 MB | unzip, then open `SPWB.app` |
+| **macOS** (Intel) | `SPWB-macos-intel.zip` — 68 MB | unzip, then open `SPWB.app` |
 
 Get them from the [**latest release**](https://github.com/Charette-AI-Group/pySPWB/releases/latest).
-Unzip the whole folder and keep it together — the executable needs the files
-beside it. Each release also carries `SPWB-checksums.txt`.
+Unzip the whole folder and keep it together — the program needs the files
+beside it. Nothing is written outside the folder except your own settings.
+Each release also carries `SPWB-checksums.txt`.
+
+Every build is checked before it is published: it has to open all five
+analysis windows, write and re-read an HDF5 file, and return the right
+numbers for a spectrum and a transfer function, on the platform it was
+built for. A build that fails any of that is never released.
 
 The builds are **not code-signed**, so the first launch needs one extra step:
 Windows SmartScreen shows *More info → Run anyway*, and macOS refuses until

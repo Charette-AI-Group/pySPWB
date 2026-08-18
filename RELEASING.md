@@ -39,21 +39,44 @@ That is the whole setup. No secrets are ever added to the repository.
 
 ## Cutting a release
 
-1. Bump `version` in `pyproject.toml` (the workflow refuses to publish if
-   the tag and this version disagree).
-2. Commit, then draft a release on GitHub with tag `v<version>` —
-   e.g. `v0.1.0` for version `0.1.0`.
-3. Publish the release. The `publish` workflow then runs the full test
-   suite, builds the sdist and wheel, checks the metadata, verifies the tag
-   matches, and uploads to PyPI.
+One tag produces both halves of a release: the PyPI package and the
+standalone downloads. It ends with a human pressing Publish, for a reason
+given below.
+
+1. Bump the version in **both** `pyproject.toml` and `src/spwb/__init__.py`.
+   `tests/test_app_config.py` fails if they disagree, and the publish
+   workflow refuses if the tag disagrees with `pyproject.toml`.
+2. `python -m build && python -m twine check dist/*` locally. This catches
+   packaging and metadata problems without spending a version number, which
+   matters because a version can never be reused or its description edited.
+3. Commit and push. Wait for `tests` to go green.
+4. Tag and push the tag:
+
+   ```bash
+   git tag -a v1.1.0 -m "..." && git push origin v1.1.0
+   ```
+
+   `build.yml` then builds the standalone application on Windows, Apple
+   Silicon and Intel macOS, runs `spwb --selftest` against each built
+   executable, and opens a **draft** release with the three zips and
+   `SPWB-checksums.txt` attached. A platform that fails its self-test fails
+   the job, and no release appears.
+5. **Review the draft and press Publish.** That is what uploads to PyPI:
+   publishing triggers `publish.yml`, which runs the full suite, builds the
+   sdist and wheel, checks the metadata, verifies the tag matches and
+   uploads.
+
+Step 5 cannot be automated away, and it is better that it cannot. GitHub
+does not start a workflow from an event raised by the default
+`GITHUB_TOKEN`, so a release published by `build.yml` itself would attach
+the binaries and never reach PyPI — silently, with every job green. The
+draft turns that constraint into the one thing this process was missing:
+a person looking at the artifacts before an upload that can never be
+undone.
 
 ## The standalone application
 
-The same tag publishes the downloads for people without Python.
-`.github/workflows/build.yml` builds `dist/SPWB` on Windows, Apple Silicon
-and Intel macOS, runs `spwb --selftest` against each built executable, and
-attaches the three zips plus `SPWB-checksums.txt` to the release created
-above. Nothing extra to do — but two things are worth knowing:
+Built and attached by step 4 above. Two things are worth knowing:
 
 * **The self-test is the gate.** A bundle can build cleanly and still be
   missing its icons, its Qt platform plugin or a working h5py; every one of

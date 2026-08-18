@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "spwb"
-version = "1.0.2"
+version = "1.1.0"
 description = "Signal Processing Work Bench - a DSP library and desktop application for spectra, transfer functions, spectrograms and adaptive filtering"
 readme = "README.md"
 license = { text = "MIT" }
