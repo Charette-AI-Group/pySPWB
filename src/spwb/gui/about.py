@@ -56,7 +56,7 @@ def about_html(year: int | None = None) -> str:
     year = datetime.date.today().year if year is None else year
     return (
         f"<h3>{app_config.APP_TITLE}</h3>"
-        f"<p>Python port, version {app_config.APP_VERSION}</p>"
+        f"<p>Version {app_config.APP_VERSION}</p>"
         f"<p>Editor: {app_config.EDITOR}<br>"
         f"AI Agent: {app_config.AI_AGENT}</p>"
         f"<p>Ported from the original "
