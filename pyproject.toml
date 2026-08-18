@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "spwb"
-version = "0.1.0"
+version = "1.0.0"
 description = "Signal Processing Work Bench - Python port of the SPWB LabVIEW application"
 readme = "README.md"
 license = { text = "MIT" }
@@ -15,7 +15,7 @@ keywords = ["signal processing", "dsp", "fft", "spectrum", "spectrogram",
             "tdms", "labview", "rpc3", "nastran", "head acoustics",
             "artemis"]
 classifiers = [
-    "Development Status :: 4 - Beta",
+    "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: MIT License",
     # Pure Python: one py3-none-any wheel serves Windows, macOS and Linux,

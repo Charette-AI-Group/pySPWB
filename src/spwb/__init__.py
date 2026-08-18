@@ -14,5 +14,5 @@ The two most-used classes are re-exported here for convenience::
 """
 from .processing import Signal, SignalStore
 
-__version__ = "0.1.0"
+__version__ = "1.0.0"
 __all__ = ["Signal", "SignalStore"]
