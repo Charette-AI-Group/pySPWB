@@ -23,6 +23,12 @@ classifiers = [
     # page matters to the people deciding whether it will run on their Mac.
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
+    # the versions requires-python allows and the CI matrix actually
+    # runs; PyPI uses these for its version filter
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Topic :: Scientific/Engineering",
 ]
 dependencies = [
