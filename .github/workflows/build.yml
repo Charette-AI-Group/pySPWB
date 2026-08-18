@@ -50,8 +50,13 @@ jobs:
             asset: SPWB-macos-apple-silicon.zip
           # macos-latest is Apple Silicon only, and a bundle built there
           # will not run on an Intel Mac. This is the second half of "any
-          # Mac", and it is the runner that will disappear first.
-          - os: macos-13
+          # Mac", and it is the half on borrowed time: GitHub retired the
+          # macos-13 image in December 2025 (a job asking for it queues
+          # forever rather than failing, which is how this was found), and
+          # drops x86_64 macOS altogether when macos-15 retires in autumn
+          # 2027. When that happens, delete this entry - Intel Macs will
+          # then need "pip install spwb[gui]" like Linux does.
+          - os: macos-15-intel
             label: macOS Intel
             artifact: spwb-macos-intel
             asset: SPWB-macos-intel.zip
